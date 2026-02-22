@@ -4165,11 +4165,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Dan\\Documents\\Projects\\ATC2027\\ATC2027\\ATC2027\\ATC2027.csproj",
+      "projectUniqueName": "C:\\Users\\Dan\\Desktop\\ATC2027\\ATC2027\\ATC2027\\ATC2027.csproj",
       "projectName": "ATC2027",
-      "projectPath": "C:\\Users\\Dan\\Documents\\Projects\\ATC2027\\ATC2027\\ATC2027\\ATC2027.csproj",
+      "projectPath": "C:\\Users\\Dan\\Desktop\\ATC2027\\ATC2027\\ATC2027\\ATC2027.csproj",
       "packagesPath": "C:\\Users\\Dan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Dan\\Documents\\Projects\\ATC2027\\ATC2027\\ATC2027\\obj\\",
+      "outputPath": "C:\\Users\\Dan\\Desktop\\ATC2027\\ATC2027\\ATC2027\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -1,19 +1,27 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ATC2027.State;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace ATC2027
 {
-    public class Game1 : Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        public AState nextState = null;
+        public AState currentState = null;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
+            this.currentState = new Loading();
+            this.nextState = null;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            Constants.contentManager = this.Content;
         }
 
         protected override void Initialize()
@@ -32,19 +40,40 @@ namespace ATC2027
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (currentState.GetType().Name.EndsWith("Loading"))
+            {
+                Constants.spriteBatch = _spriteBatch;
+                Constants.DevMode = true;
+
+                if (Constants.spriteBatch != null)
+                    nextState = new ATC2027.State.Game();
+
+            }
+
+            if (nextState != null)
+            {
+                currentState = nextState;
+                nextState = null;
+            }
+
+            currentState.Update(gameTime);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Constants.background);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+
+            currentState.Draw(gameTime, _spriteBatch);
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }

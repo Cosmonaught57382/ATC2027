@@ -1,1 +1,4 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/Dan/Desktop/ATC2027/ATC2027/ATC2027/Content/Arial_12.spritefont","C:/Users/Dan/Desktop/ATC2027/ATC2027/ATC2027/Content/bin/Windows/Content/Arial_12.xnb","LocalizedFontProcessor","SpriteFontContent",2497,931,0.1629545
+"C:/Users/Dan/Desktop/ATC2027/ATC2027/ATC2027/Content/Arial_7.spritefont","C:/Users/Dan/Desktop/ATC2027/ATC2027/ATC2027/Content/bin/Windows/Content/Arial_7.xnb","FontDescriptionProcessor","SpriteFontContent",2067,13337,0.1637243
+"C:/Users/Dan/Desktop/ATC2027/ATC2027/ATC2027/Content/gameFont.spritefont","C:/Users/Dan/Desktop/ATC2027/ATC2027/ATC2027/Content/bin/Windows/Content/gameFont.xnb","LocalizedFontProcessor","SpriteFontContent",2497,931,0.0069192

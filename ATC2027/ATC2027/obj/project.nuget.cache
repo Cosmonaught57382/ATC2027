@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4tXWQqaVvbA=",
+  "dgSpecHash": "jhzCkbbOkgM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Dan\\Documents\\Projects\\ATC2027\\ATC2027\\ATC2027\\ATC2027.csproj",
+  "projectFilePath": "C:\\Users\\Dan\\Desktop\\ATC2027\\ATC2027\\ATC2027\\ATC2027.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Dan\\.nuget\\packages\\microsoft.netcore.app\\2.1.30\\microsoft.netcore.app.2.1.30.nupkg.sha512",
     "C:\\Users\\Dan\\.nuget\\packages\\microsoft.netcore.dotnetapphost\\2.1.30\\microsoft.netcore.dotnetapphost.2.1.30.nupkg.sha512",
