@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ATC2027.ATC_Library
+namespace ATC2027.ATC_Library.Clearance
 {
-    public class Clearance
+    public class Clearance : IClearance
     {
         IHeading? heading;
         IAltitude? altitude;
@@ -22,24 +22,30 @@ namespace ATC2027.ATC_Library
             this.speed = speed;
         }
 
-        public Clearance ApplyHeading(IHeading heading)
+        public IClearance ApplyHeading(IHeading heading)
         {
             this.heading = heading;
             return this;
         }
 
-        public Clearance ApplyAltitude(IAltitude altitude)
+        public IClearance ApplyAltitude(IAltitude altitude)
         {
             this.altitude = altitude;
             return this;
         }
 
-        public Clearance ApplySpeed(ISpeed speed)
+        public IClearance ApplySpeed(ISpeed speed)
         {
             this.speed = speed;
             return this;
         }
+        public void Empty()
+        {
+            this.speed = null;
+            this.altitude = null;
+            this.heading = null;
+        }
 
-        public Clearance getNullClearance => new Clearance(null, null, null);
+        public Clearance getClearedClearance => new Clearance(null, null, null);
     }
 }
