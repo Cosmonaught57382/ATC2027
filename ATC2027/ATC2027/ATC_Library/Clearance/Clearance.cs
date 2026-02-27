@@ -46,6 +46,6 @@ namespace ATC2027.ATC_Library.Clearance
             this.heading = null;
         }
 
-        public Clearance getClearedClearance => new Clearance(null, null, null);
+        public static Clearance getEmptyClearance() { return new Clearance(null, null, null);
     }
 }

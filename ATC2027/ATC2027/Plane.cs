@@ -1,4 +1,5 @@
 ﻿using ATC2027.ATC_Library;
+using ATC2027.ATC_Library.Clearance;
 using ATC2027.ATC_Library.Heading;
 using ATC2027.Controls;
 using ATC2027.DataStructures;
@@ -20,6 +21,8 @@ namespace ATC2027
     {
 
         Vector2 location;
+        IClearance clearance;
+
         bool isSelected;
 
         Color selectedTextDrawColor;
@@ -58,8 +61,16 @@ namespace ATC2027
             Arrival,Departure,FlyOver,Unknown
         }
         #endregion
-        public Plane(FlightNumber flNo, IHeading heading, IAltitude altitude, ISpeed speed, Vector2 location, GraphicsDevice graphicsDevice, Color? selectedDrawColor = null, Color? nonSelectedDrawColor = null)
+        public Plane(FlightNumber flNo, IHeading heading, IAltitude altitude, ISpeed speed, Vector2 location, GraphicsDevice graphicsDevice, IClearance? clearance = null, Color? selectedDrawColor = null, Color? nonSelectedDrawColor = null)
         {
+            this.clearance = clearance;
+
+            if (this.clearance == null)
+            {
+                this.clearance = Clearance.getEmptyClearance();
+            }
+
+
             this.flightNumber = flNo;
             this.heading = heading;
             this.altitude = altitude;
