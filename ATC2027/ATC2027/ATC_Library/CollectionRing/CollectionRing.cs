@@ -68,6 +68,10 @@ namespace ATC2027.ATC_Library.CollectionRing
         {
             planeCollection.Remove(plane, out byte outByte);
         }
-        
+
+        ConcurrentDictionary<Plane, byte> IAircraftCollectionRing.getAircraftCollection()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

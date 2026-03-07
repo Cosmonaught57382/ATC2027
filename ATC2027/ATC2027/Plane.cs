@@ -1,5 +1,6 @@
 ﻿using ATC2027.ATC_Library;
 using ATC2027.ATC_Library.Clearance;
+using ATC2027.ATC_Library.CollectionRing;
 using ATC2027.ATC_Library.Heading;
 using ATC2027.Controls;
 using ATC2027.DataStructures;
@@ -112,7 +113,7 @@ namespace ATC2027
 
         private void DrawBottomLine(SpriteBatch spriteBatch, ref Square planeHead)
         {
-            var font = Constants.getArial_5();
+            var font = Constants.getArial_7();
             var location = planeHead.GetCentre();
             var str = getTopLine();
             location.X -= font.MeasureString(str).X / 3;
@@ -123,7 +124,7 @@ namespace ATC2027
 
         private void DrawTopLine(SpriteBatch spriteBatch, ref Square planeHead)
         {
-            var font = Constants.getArial_5();
+            var font = Constants.getArial_7();
             var location = planeHead.GetCentre();
             var topLine = getTopLine();
 
@@ -217,6 +218,16 @@ namespace ATC2027
                 this.heading, 
                 this.speed, 
                 ATC_Library.FlightRelationToAirfield.FlightRelationToAirfieldEnum.FlyOver);
+        }
+
+        internal void setClearance(IClearance clearance)
+        {
+            this.clearance = clearance;
+        }
+
+        internal IAircraftCollectionRingItem ToAirCraftCollectionRingItem()
+        {
+            throw new NotImplementedException();
         }
     }
 }
