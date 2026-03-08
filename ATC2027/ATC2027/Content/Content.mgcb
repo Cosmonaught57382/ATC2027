@@ -27,10 +27,3 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial_7.spritefont
 
-#begin gameFont.spritefont
-/importer:FontDescriptionImporter
-/processor:LocalizedFontProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:gameFont.spritefont
-
