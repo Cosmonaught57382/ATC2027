@@ -1,0 +1,71 @@
+﻿using ATC2027.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace ATC2027.Controls
+{
+    public class Circle : IComponent
+    {
+        GraphicsDevice graphicsDevice;
+        Vector2 location;
+        int radius;
+        Color color;
+
+        bool radiusHasChanged;
+
+        bool getShouldTextureBeUpdated() => radiusHasChanged;
+
+        Texture2D texture;
+
+        public Circle(Vector2 location, int radius, GraphicsDevice graphicsDevice) {
+            this.location = location;
+            this.radius = radius;
+            this.graphicsDevice = graphicsDevice;
+            
+            UpdateTexture();
+        }
+
+        public void setLocation(Vector2 vector2) => this.location = vector2;
+        public Vector2 getLocation() => this.location;
+        public int getRadius() => this.radius;
+        public void setRadius(int radius) => this.radius = radius;
+
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            
+        }
+
+        public void UpdateTexture()
+        {
+            int diameter = radius * 2;
+            this.texture = new Texture2D(this.graphicsDevice, diameter, diameter);
+            Color[] data = new Color[diameter * diameter];
+
+            for (int y = 0; y < diameter; y++)
+            {
+                for (int x = 0; x < diameter; x++)
+                {
+                    int index = x + y * diameter;
+                    Vector2 pos = new Vector2(x - radius, y - radius);
+                    data[index] = pos.Length() <= radius ? color : Color.Transparent;
+                }
+            }
+            this.texture.SetData(data);
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            if (getShouldTextureBeUpdated())
+            {
+                UpdateTexture();
+            }
+        }
+    }
+}
