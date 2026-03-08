@@ -1,13 +1,12 @@
 ﻿using ATC2027.Interfaces;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ATC2027.Controls
 {
@@ -24,7 +23,7 @@ namespace ATC2027.Controls
 
         Texture2D texture;
 
-        public Circle(Vector2 location, int radius, GraphicsDevice graphicsDevice) {
+        public Circle(Microsoft.Xna.Framework.Vector2 location, int radius, GraphicsDevice graphicsDevice) {
             this.location = location;
             this.radius = radius;
             this.graphicsDevice = graphicsDevice;
