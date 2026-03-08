@@ -39,7 +39,7 @@ namespace ATC2027.Controls
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            
+            spriteBatch.Draw(texture, location, null, color);
         }
 
         public void UpdateTexture()
