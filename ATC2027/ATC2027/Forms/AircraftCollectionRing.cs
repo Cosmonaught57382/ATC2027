@@ -24,7 +24,7 @@ namespace ATC2027.Forms
 
         private void btnApplyClearance_DragEnter(object sender, DragEventArgs e)
         {
-            //Mouse to be hand with finger
+
         }
 
         private void AircraftCollectionRing_Load(object sender, EventArgs e)
@@ -33,7 +33,7 @@ namespace ATC2027.Forms
             txtBoxHeading.TabIndex = 1;
             txtBoxAltitude.TabIndex = 2;
 
-            cmbBoxAltitudeType.SelectedIndex = 3;
+            cmbBoxAltitudeType.TabIndex = 3;
 
             cmbBoxAltitudeType.Items.Clear();
             cmbBoxAltitudeType.Items.Add("Feet");
@@ -44,7 +44,7 @@ namespace ATC2027.Forms
 
         private void cmbBoxSelectAircraft_MouseEnter(object sender, EventArgs e)
         {
-            //Mouse to be hand with finger
+            cmbBoxAltitudeType.Cursor = Cursors.Hand;
         }
 
         private void txtBoxAltitude_TextChanged(object sender, EventArgs e)
@@ -54,7 +54,17 @@ namespace ATC2027.Forms
 
         private void cmbBoxAltitudeType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //Mouse to be hand with finger
+            cmbBoxAltitudeType.Cursor = Cursors.Hand;
+        }
+
+        internal void SetDataGrids(IList<StatusBoardItem> statusBoardItemList)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void btnApplyClearance_MouseHover(object sender, EventArgs e)
+        {
+            cmbBoxAltitudeType.Cursor = Cursors.SizeAll;
         }
     }
 }
