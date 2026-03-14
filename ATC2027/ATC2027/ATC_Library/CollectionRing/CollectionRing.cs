@@ -1,4 +1,5 @@
 ﻿using ATC2027.ATC_Library.Clearance;
+using ATC2027.Forms;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,21 +12,23 @@ namespace ATC2027.ATC_Library.CollectionRing
 {
     public class CollectionRing : IAircraftCollectionRing
     {
-        public ConcurrentDictionary<Plane, byte> planeCollection;
+        
+        public Dictionary<string, Plane> planeCollection;
 
         public CollectionRing()
         {
-            planeCollection = new ConcurrentDictionary<Plane, byte>();
+            planeCollection = new Dictionary<string, Plane>();
         }
 
         public void AddPlane(Plane plane)
         {
-            planeCollection.Append(new KeyValuePair<Plane, byte>(plane, new byte()));
+
+            planeCollection.Add(plane.flightNoAsStr(), plane);
         }
 
         public void ApplyClearance(IClearance clearance, ref Plane plane)
         {
-            plane.setClearance(clearance);
+            plane.setClearance(ref clearance);
         }
 
         public void ClearAircraftCollection()
@@ -35,7 +38,7 @@ namespace ATC2027.ATC_Library.CollectionRing
 
         public bool Contains(Plane plane)
         {
-            return planeCollection.ContainsKey(plane);
+            return planeCollection.ContainsKey(plane.flightNoAsStr());
         }
 
         public IAircraftCollectionRing fromIATA_Code(string IATA_Code)
@@ -50,15 +53,15 @@ namespace ATC2027.ATC_Library.CollectionRing
 
         public IList<Plane> getAircraftCollection()
         {
-            return planeCollection.Keys.ToList();
+            return planeCollection.Values.ToList();
         }
 
-        public IList<IAircraftCollectionRingItem> getAircraftCollectionRingListItemsAsList()
+        public IList<StatusBoardItem> getAircraftCollectionRingListItemsAsList()
         {
-            List<IAircraftCollectionRingItem> aircraftCollectionRingItem = [];
+            List<StatusBoardItem> aircraftCollectionRingItem = [];
 
             foreach (var kvp in planeCollection) {
-                aircraftCollectionRingItem.Add(kvp.Key.ToAirCraftCollectionRingItem());
+                aircraftCollectionRingItem.Add(kvp.Value.toStatusBoardItem());
             }
 
             return aircraftCollectionRingItem;
@@ -66,7 +69,16 @@ namespace ATC2027.ATC_Library.CollectionRing
 
         public void RemovePlane(Plane plane)
         {
-            planeCollection.Remove(plane, out byte outByte);
+            planeCollection.Remove(plane.flightNoAsStr(), out _);
+        }
+
+        internal Plane? GetPlaneByFlightNumber(string flightNumber)
+        {
+            Plane? plane;
+            if (!planeCollection.TryGetValue(flightNumber, out plane))
+                plane = null;
+
+            return plane;
         }
 
         ConcurrentDictionary<Plane, byte> IAircraftCollectionRing.getAircraftCollection()

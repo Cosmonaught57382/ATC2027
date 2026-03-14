@@ -9,10 +9,16 @@ namespace ATC2027.Library.Speed
     public class Speed : ISpeed
     {
         private float knots;
+        private string text;
 
         public Speed(float knots)
         {
             this.knots = knots;
+        }
+
+        public Speed(string text)
+        {
+            this.text = text;
         }
 
         public int ToKnots()

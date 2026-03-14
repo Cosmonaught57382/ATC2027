@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ATC2027.Library.Altitude
 {
@@ -11,6 +12,7 @@ namespace ATC2027.Library.Altitude
         private float feet;
         private bool hasChanged;
         private string memoizedToString;
+
         public Altitude(float feet)
         {
             this.feet = feet;
@@ -18,6 +20,15 @@ namespace ATC2027.Library.Altitude
             memoizedToString = ToString();
             this.hasChanged = false;
         }
+
+        public Altitude(string text, ComboBox cmbBoxAltitudeType)
+        {
+            if (cmbBoxAltitudeType.Text.ToLower() == "feet")
+                this.feet = int.Parse(text);
+            else
+                this.feet = int.Parse(text) * 100;
+        }
+
         public int GetAltitudeInFeet()
         {
             return (int)(feet);

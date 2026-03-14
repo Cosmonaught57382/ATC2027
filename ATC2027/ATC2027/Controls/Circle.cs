@@ -1,12 +1,6 @@
 ﻿using ATC2027.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ATC2027.Controls
 {
@@ -34,7 +28,10 @@ namespace ATC2027.Controls
         public void setLocation(Vector2 vector2) => this.location = vector2;
         public Vector2 getLocation() => this.location;
         public int getRadius() => this.radius;
-        public void setRadius(int radius) => this.radius = radius;
+        public void setRadius(int radius) {
+            this.radius = radius;
+            this.radiusHasChanged = true;
+        } 
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
@@ -43,6 +40,8 @@ namespace ATC2027.Controls
 
         public void UpdateTexture()
         {
+            this.radiusHasChanged = false;
+
             int diameter = radius * 2;
             this.texture = new Texture2D(this.graphicsDevice, diameter, diameter);
             Color[] data = new Color[diameter * diameter];
@@ -53,7 +52,7 @@ namespace ATC2027.Controls
                 {
                     int index = x + y * diameter;
                     Vector2 pos = new Vector2(x - radius, y - radius);
-                    data[index] = pos.Length() <= radius ? color : Color.Transparent;
+                    data[index] = pos.Length() <= radius ? this.color : Color.Transparent;
                 }
             }
             this.texture.SetData(data);

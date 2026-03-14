@@ -9,10 +9,16 @@ namespace ATC2027.ATC_Library.Heading
     public class Heading : IHeading
     {
         private float v;
+        private string text;
 
         public Heading(float v)
         {
             this.v = v;
+        }
+
+        public Heading(string text)
+        {
+            this.text = text;
         }
 
         public int GetHeadingInIntegerDegrees()

@@ -199,7 +199,7 @@ namespace ATC2027
             return speed.ToKnots().ToString();
         }
         
-        string flightNoAsStr()
+        public string flightNoAsStr()
         {
             return flightNumber.ToString();
         }
@@ -220,7 +220,7 @@ namespace ATC2027
                 ATC_Library.FlightRelationToAirfield.FlightRelationToAirfieldEnum.FlyOver);
         }
 
-        internal void setClearance(IClearance clearance)
+        internal void setClearance(ref IClearance clearance)
         {
             this.clearance = clearance;
         }
