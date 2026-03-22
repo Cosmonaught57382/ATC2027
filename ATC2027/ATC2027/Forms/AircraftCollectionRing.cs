@@ -344,7 +344,6 @@ namespace ATC2027.Forms
             int selectedIndex = tabControl.SelectedIndex;
             try
             {
-                var selectedIndex = tabControl.SelectedIndex;
                 var dgv = tabIndexAndDataGridView[selectedIndex];
                 IList<StatusBoardItem> statusBoardItems;
 
