@@ -214,7 +214,7 @@ namespace ATC2027.Forms
                         var val = Int128.Parse(txtBoxHeading.Text);
                         altitudeIsValid = val < 100000 && val > -1;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         headingIsValid = false;
                     }
@@ -227,7 +227,7 @@ namespace ATC2027.Forms
                         var val = Int128.Parse(txtBoxHeading.Text);
                         altitudeIsValid = val < 100 && val > -1;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         headingIsValid = false;
                     }
@@ -295,15 +295,14 @@ namespace ATC2027.Forms
             }
             catch (Exception) {
                 
-                DialogResult result = MessageBox.Show(this, $"Unable to find {cmbBoxSelectAircraft.Text}","Error",MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
+                DialogResult result = MessageBox.Show(this, $"Unable to find {cmbBoxSelectAircraft.Text}","Warning",MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
 
                 if (result == DialogResult.Cancel) { return; }
                 else if (result == DialogResult.Retry)
                     btnApplyClearance_Click(this, new EventArgs());
                 else
                 {
-                    return;
-                    throw new Exception($"Dialogue result {result} not handled");
+                    MessageBox.Show(this, $"Dialogue result {result} not handled", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 return;
             }
@@ -342,6 +341,7 @@ namespace ATC2027.Forms
 
         private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
+            int selectedIndex = tabControl.SelectedIndex;
             try
             {
                 var selectedIndex = tabControl.SelectedIndex;
@@ -372,7 +372,7 @@ namespace ATC2027.Forms
             }
             catch (Exception)
             {
-                lblResult.Text = "ERROR - unable to set dgv";
+                lblResult.Text = $"ERROR - unable to set dgv with a selectedTabIndex of {selectedIndex}";
                 tabControl.SelectedIndex = 0;
             }
             
