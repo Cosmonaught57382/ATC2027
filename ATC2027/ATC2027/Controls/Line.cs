@@ -1,13 +1,8 @@
 ﻿using ATC2027.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct2D1;
-using SharpDX.MediaFoundation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ATC2027.Controls
 {
@@ -110,7 +105,7 @@ namespace ATC2027.Controls
             return this.start != null && this.end != null;
         }
 
-        public void Draw(GameTime gameTime, Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
 
             if (end == null || start == null)

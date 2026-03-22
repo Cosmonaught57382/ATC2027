@@ -21,13 +21,13 @@ namespace ATC2027
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            Constants.contentManager = this.Content;
+            
         }
 
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            Constants.contentManager = this.Content;
             base.Initialize();
         }
 

@@ -10,5 +10,6 @@ namespace ATC2027.ATC_Library.Heading
     {
         public int GetHeadingInIntegerDegrees();
         public string ToString();
+        public float GetHeadingInFloatDegrees();
     }
 }

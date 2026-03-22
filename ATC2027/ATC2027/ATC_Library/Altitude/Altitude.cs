@@ -26,7 +26,7 @@ namespace ATC2027.Library.Altitude
             if (cmbBoxAltitudeType.Text.ToLower() == "feet")
                 this.feet = int.Parse(text);
             else
-                this.feet = int.Parse(text) * 100;
+                this.feet = int.Parse(text) * 1000;
         }
 
         public int GetAltitudeInFeet()

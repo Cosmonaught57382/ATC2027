@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ATC2027
 {
@@ -49,6 +51,9 @@ namespace ATC2027
                 arial_12 = contentManager.Load<SpriteFont>("Arial_12");
             return arial_12;
         }
+        #endregion
+        #region keyboard
+        public static KeyboardState getKeyboardState() => Keyboard.GetState();
         #endregion
     }
 }

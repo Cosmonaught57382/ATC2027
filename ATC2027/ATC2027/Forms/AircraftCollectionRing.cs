@@ -1,6 +1,9 @@
-﻿using ATC2027.ATC_Library.Clearance;
+﻿#pragma warning disable IDE1006 // Naming Styles
+
+using ATC2027.ATC_Library.Clearance;
 using ATC2027.ATC_Library.CollectionRing;
 using ATC2027.ATC_Library.Heading;
+using ATC2027.DataStructures;
 using ATC2027.Library.Altitude;
 using ATC2027.Library.Speed;
 using SharpDX.DirectWrite;
@@ -19,16 +22,14 @@ namespace ATC2027.Forms
 {
     public partial class AircraftCollectionRing : Form
     {
-        CollectionRing cr;
-        IList<StatusBoardItem> statusBoardItemList;
-        private IList<StatusBoardItem> arrivalStatusBoardItems => statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "arr").ToList();
-        //private readonly int indexOfArrivalStatusBoardItems = 0;
-        private IList<StatusBoardItem> departureStatusBoardItems => statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "dep").ToList();
-        //private int indexOfDepartureStatusBoardItems = 1;
-        private IList<StatusBoardItem> flyByStatusBoardItems => statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "FlyOver").ToList();
-        //private int indexOfFlyByStatusBoardItems = 2;
+        private readonly CollectionRing cr;
+        private readonly EventBasedList<StatusBoardItem> statusBoardItemList;
+        private IList<StatusBoardItem> arrivalStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "arr")];
+        private IList<StatusBoardItem> departureStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "dep")];
+        private IList<StatusBoardItem> flyByStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "FlyOver")];
 
-        private Dictionary<int, DataGridView> tabIndexAndDataGgridView;
+        private readonly Dictionary<int, DataGridView> tabIndexAndDataGridView;
+        private readonly Dictionary<int, Func<IList<StatusBoardItem>>> tabIndexAndFunctionThatGetsStatusBoardItems;
 
         public AircraftCollectionRing(ref CollectionRing cr)
         {
@@ -36,28 +37,73 @@ namespace ATC2027.Forms
 
             InitializeComponent();
 
-            if (statusBoardItemList == null)
-                statusBoardItemList = [];
+            statusBoardItemList ??= [];
 
-            this.statusBoardItemList = cr.getAircraftCollectionRingListItemsAsList();
+            this.statusBoardItemList = [.. cr.getAircraftCollectionRingListItemsAsList()];
 
             InitialiseDataGridView(ref dgvAllAircraft, this.statusBoardItemList);
 
-            tabIndexAndDataGgridView = new Dictionary<int, DataGridView>
+            tabIndexAndDataGridView = new Dictionary<int, DataGridView>
             {
                 { 0, dgvAllAircraft },
                 { 1, dgvArrivals },
                 { 2, dgvDepartures },
                 { 3, dgvFlyBy }
             };
+
+            tabIndexAndFunctionThatGetsStatusBoardItems = new Dictionary<int, Func<IList<StatusBoardItem>>>
+            {
+                {0, statusBoardItemList.ToList},
+                {1, arrivalStatusBoardItems.ToList},
+                {2, departureStatusBoardItems.ToList},
+                {3, flyByStatusBoardItems.ToList}
+            };
+
+            statusBoardItemList.ItemAdded += UpdateDataGridViewOfSelectedTabIndex;
+            statusBoardItemList.ItemRemoved += UpdateDataGridViewOfSelectedTabIndex;
+            statusBoardItemList.ItemHasBeenSetByIndexAccess += UpdateDataGridViewOfSelectedTabIndex;
         }
 
+        private void UpdateDataGridViewOfSelectedTabIndex(object sender, EventArgs? e = null)
+        {
+            //set e to empty if e is null, good practice atm, e isn't accessed or used yet.
+            e ??= EventArgs.Empty;
 
+            //get the current index
+            int index = tabControl.TabIndex;
+
+            //get the dgv associated with the current index
+            DataGridView dgv;
+            try
+            {
+                dgv = tabIndexAndDataGridView[index];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                MessageBox.Show($"The {nameof(tabIndexAndDataGridView)} didn't have an item at index {tabControl.TabIndex}");
+                return;
+            }
+
+            //get the function that gets the status board items associated with the current index
+            Func<IList<StatusBoardItem>> funcThatGetsStatusBoardItems;
+            try
+            {
+                funcThatGetsStatusBoardItems = tabIndexAndFunctionThatGetsStatusBoardItems[index];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                DialogResult dialogResult = MessageBox.Show($"The {nameof(tabIndexAndFunctionThatGetsStatusBoardItems)} didn't have an item at index {tabControl.TabIndex}");
+                return;
+            }
+
+            InitialiseDataGridView(ref dgv, funcThatGetsStatusBoardItems());
+        }
+
+        
         private void btnApplyClearance_DragOver(object sender, DragEventArgs e)
         {
             //do nothing here, function is being kept so the form doesn't break
         }
-
         private void btnApplyClearance_DragEnter(object sender, DragEventArgs e)
         {
             //do nothing here, function is being kept so the form doesn't break
@@ -146,7 +192,7 @@ namespace ATC2027.Forms
                 var val = Int128.Parse(txtBoxHeading.Text);
                 headingIsValid = val < 361 && val > -1;
             }
-            catch (Exception ex) { 
+            catch (Exception) { 
                 headingIsValid = false;
             }
             //validate altitude
@@ -196,14 +242,14 @@ namespace ATC2027.Forms
             //validate speed
 
 
-            bool speedIsValid = false;
+            bool speedIsValid;
             //speed is larger than 0 and less than 400
             try
             {
                 var val = Int128.Parse(txtBoxSpeed.Text);
                 speedIsValid = val < 400 && val > 50;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 speedIsValid = false;
             }
@@ -247,7 +293,7 @@ namespace ATC2027.Forms
             {
                 plane = cr.GetPlaneByFlightNumber(cmbBoxSelectAircraft.Text);
             }
-            catch (Exception ex) {
+            catch (Exception) {
                 
                 DialogResult result = MessageBox.Show(this, $"Unable to find {cmbBoxSelectAircraft.Text}","Error",MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
 
@@ -278,11 +324,11 @@ namespace ATC2027.Forms
             DataGridView dgv;
             try
             {
-                dgv = tabIndexAndDataGgridView[tabControl.SelectedIndex];
+                dgv = tabIndexAndDataGridView[tabControl.SelectedIndex];
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                //tabControl.SelectedIndex was not a valid value for the number of items in tabIndexAndDataGgridView
+                //tabControl.SelectedIndex was not a valid value for the number of items in tabIndexAndDataGridView
                 return;
             }
             cmbBoxSelectAircraft.Items.Clear();
@@ -299,7 +345,7 @@ namespace ATC2027.Forms
             try
             {
                 var selectedIndex = tabControl.SelectedIndex;
-                var dgv = tabIndexAndDataGgridView[selectedIndex];
+                var dgv = tabIndexAndDataGridView[selectedIndex];
                 IList<StatusBoardItem> statusBoardItems;
 
                 switch (selectedIndex)
