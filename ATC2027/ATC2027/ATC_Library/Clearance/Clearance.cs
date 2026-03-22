@@ -11,20 +11,20 @@ namespace ATC2027.ATC_Library.Clearance
 {
     public class Clearance : IClearance
     {
-        IHeading? heading;
-        IAltitude? altitude;
-        ISpeed? speed;
+        private IHeading Heading;
+        IAltitude altitude;
+        ISpeed speed;
 
-        public Clearance(IHeading? heading = null, IAltitude? altitude = null, ISpeed? speed = null)
+        public Clearance(IHeading heading = null, IAltitude altitude = null, ISpeed speed = null)
         {
-            this.heading = heading;
+            this.Heading = heading;
             this.altitude = altitude;
             this.speed = speed;
         }
 
         public IClearance ApplyHeading(IHeading heading)
         {
-            this.heading = heading;
+            this.Heading = heading;
             return this;
         }
 
@@ -43,7 +43,7 @@ namespace ATC2027.ATC_Library.Clearance
         {
             this.speed = null;
             this.altitude = null;
-            this.heading = null;
+            this.Heading = null;
         }
 
         public static Clearance getEmptyClearance()

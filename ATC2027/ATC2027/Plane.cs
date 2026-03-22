@@ -10,11 +10,10 @@ using ATC2027.Interfaces;
 using ATC2027.Library.Altitude;
 using ATC2027.Library.FlightNumber;
 using ATC2027.Library.Speed;
-using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
+using System.Drawing.Text;
 
 namespace ATC2027
 {
@@ -23,8 +22,10 @@ namespace ATC2027
 
         Vector2 location;
         IClearance clearance;
+        
+        TimeSpan? timeOfLastUpdate = null;
 
-        bool isSelected;
+        bool isSelected = true;
 
         Color selectedTextDrawColor;
         Color normalTextDrawColor;
@@ -54,7 +55,7 @@ namespace ATC2027
         //FlightNumber
         FlightNumber flightNumber;
         //Heading
-        IHeading heading;
+        Heading heading;
         #region vertical movement enum and method
 
         enum FlightRelationToAirfield
@@ -73,7 +74,7 @@ namespace ATC2027
 
 
             this.flightNumber = flNo;
-            this.heading = heading;
+            this.heading = new Heading(heading);
             this.altitude = altitude;
             this.speed = speed;
 
@@ -116,10 +117,18 @@ namespace ATC2027
             var font = Constants.getArial_7();
             var location = planeHead.GetCentre();
             var str = getTopLine();
-            location.X -= font.MeasureString(str).X / 3;
+            location.X -= font.MeasureString(str).X / 2;
             location.Y += font.MeasureString(str).Y / 2;
 
-            Text.StaticDraw(spriteBatch, this.getBottomLine(), font, location, Color.White);
+            if (isSelected)
+            {
+                Text.StaticDraw(spriteBatch, this.getBottomLine(), font, location, selectedTextDrawColor);
+            }
+            else
+            {
+                Text.StaticDraw(spriteBatch, this.getBottomLine(), font, location, normalTextDrawColor);
+            }
+            
         }
 
         private void DrawTopLine(SpriteBatch spriteBatch, ref Square planeHead)
@@ -133,20 +142,70 @@ namespace ATC2027
 
             location.X -= font.MeasureString(str).X / 2;
             location.Y -= font.MeasureString(str).Y;
-
-            Text.StaticDraw(spriteBatch, topLine, font, location, Color.White);
+            
+            if (isSelected)
+                Text.StaticDraw(spriteBatch, topLine, font, location, selectedTextDrawColor);
+            else
+                Text.StaticDraw(spriteBatch, topLine, font, location, normalTextDrawColor);
         }
 
         public override void Update(GameTime gameTime)
         {
-            //Determine draw colour of the tail
+            //Determine draw colour of the head and tail
             if (isSelected)
+            {
+                head.SetColor(selectedTextDrawColor);
                 tail.SetColor(selectedTextDrawColor);
+            }
             else
+            {
+                head.SetColor(normalTextDrawColor);
                 tail.SetColor(normalTextDrawColor);
+            }
+            
 
+            UpdateTailInformation(gameTime);
+            UpdateHeadInformation(gameTime);
+            
+            tail.Update(gameTime);
+            head.Update(gameTime);
+
+
+            //update heading
+            if (isSelected)
+            {
+                bool leftArrowDown = false;
+                bool rightArrowDown = false;
+
+                if (leftArrowDown)
+                {
+                    this.heading--;
+                }
+                if (rightArrowDown)
+                {
+                    this.heading++;
+                }
+            }
+
+        }
+        private void UpdateHeadInformation(GameTime gameTime)
+        {
+            if (head is null)
+                return;
+            
+            float magnitudeOfMovement = (float)gameTime.ElapsedGameTime.Nanoseconds / 1000f;
+            Vector2 directionOfMovement = new Vector2(
+                (float)Math.Cos(heading.GetHeadingInFloatRadians()),
+                (float)Math.Sin(heading.GetHeadingInFloatRadians())
+            );
+            
+            head.SetCentre(head.GetCentre() + (directionOfMovement * magnitudeOfMovement));
+            
+        }
+
+        private void UpdateTailInformation(GameTime gameTime)
+        {
             previousLocations.UpdateDataStructure(gameTime.TotalGameTime);
-
             //update start and end point of the tail only when there's been an update to previous locations
             if (previousLastAppendageToPreviousLocations != lastAppendageToPreviousLocations)
             {
@@ -154,7 +213,7 @@ namespace ATC2027
                 {
                     tail.SetStart(previousLocations.Last());
                 }
-                catch (ArgumentNullException ane)
+                catch (ArgumentNullException)
                 {
                     tail.SetStart(null);
                 }
@@ -162,11 +221,11 @@ namespace ATC2027
                 {
                     tail.SetEnd(previousLocations.First());
                 }
-                catch (ArgumentException ane)
+                catch (ArgumentException)
                 {
                     tail.SetEnd(null);
                 }
-                    
+
                 previousLastAppendageToPreviousLocations = lastAppendageToPreviousLocations;
             }
 
@@ -177,13 +236,34 @@ namespace ATC2027
                 AddPlaneLocationToPreviousLocations(ts);
                 lastAppendageToPreviousLocations = ts;
             }
-            
-            tail.Update(gameTime);
-            head.Update(gameTime);
-
-
         }
 
+        private float CalculateHeadingBasedXMultiplier(float heading)
+        {
+            heading = heading % 360;
+            float toReturn = 0;
+
+            if (heading <= 90)
+                toReturn = MathExtension.Map(heading / 360, 0, 1);
+            else if (heading <= 270)
+                toReturn = MathExtension.Map(heading / 360, -1, 1);
+            else if (heading <= 360)
+                toReturn = MathExtension.Map(heading / 360, -1, 0);
+            return toReturn;
+
+        }
+        private float CalculateHeadingBasedYMultiplier(float heading)
+        {
+            heading = heading % 360;
+            float toReturn = 0;
+
+            if (heading <= 180)
+                toReturn = MathExtension.Map(heading / 360, -1, 1);
+            else if (heading <= 360)
+                toReturn = MathExtension.Map(heading / 360, 1, -1);
+            
+            return toReturn;
+        }
         private void AddPlaneLocationToPreviousLocations(TimeSpan ts)
         {
             previousLocations.AddItem(head.GetCentre(), ts);
@@ -206,7 +286,7 @@ namespace ATC2027
 
         public string getDevModeDrawableString()
         {
-            return $"tail    start  {tail.GetStartAsString()},  end  {tail.GetStartAsEnd()}\n    previousLocations.Count: {previousLocations.Count}"; 
+            return $"tail    start  {tail.GetStartAsString()},  end  {tail.GetStartAsEnd()}\n    previousLocations.Count: {previousLocations.Count}\n    head.getCentre(): {head.GetCentre().ToString()}\n    heading: {heading.ToString()}"; 
         }
 
         public StatusBoardItem toStatusBoardItem()
@@ -228,6 +308,15 @@ namespace ATC2027
         internal IAircraftCollectionRingItem ToAirCraftCollectionRingItem()
         {
             throw new NotImplementedException();
+        }
+        internal void DecrementHeading()
+        {
+            this.heading--;
+        }
+
+        internal void IncrementHeading()
+        {
+            this.heading++;
         }
     }
 }

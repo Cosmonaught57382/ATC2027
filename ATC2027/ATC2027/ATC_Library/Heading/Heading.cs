@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace ATC2027.ATC_Library.Heading
 {
     public class Heading : IHeading
     {
         private float v;
-        private string text;
 
         public Heading(float v)
         {
@@ -18,12 +19,24 @@ namespace ATC2027.ATC_Library.Heading
 
         public Heading(string text)
         {
-            this.text = text;
+            if (!float.TryParse(text, out v))
+                throw new ArgumentException($"Could not convert {nameof(text)} to a float value. {nameof(text)} had the value {text}"); 
+        }
+
+        public Heading(IHeading heading)
+        {
+            this.v = heading.GetHeadingInFloatDegrees();
+        }
+
+        public float GetHeadingInFloatDegrees()
+        {
+            return v;
         }
 
         public int GetHeadingInIntegerDegrees()
         {
-            throw new NotImplementedException();
+            return (int)v;
+
         }
 
         public override string ToString() { 
@@ -36,5 +49,29 @@ namespace ATC2027.ATC_Library.Heading
             return str;
         }
 
+        internal float GetHeadingInFloatRadians()
+        {
+            return MathHelper.ToRadians(v-90);
+        }
+
+        public static Heading operator ++(Heading operand)
+        {
+            float currentHeadingAsFloat = operand.GetHeadingInFloatDegrees();
+            currentHeadingAsFloat += 1;
+            currentHeadingAsFloat %= 360;
+            return new Heading(currentHeadingAsFloat);
+        }
+        public static Heading operator --(Heading operand)
+        {
+            float currentHeadingAsFloat = operand.GetHeadingInFloatDegrees();
+            currentHeadingAsFloat -= 1;
+            
+            while (currentHeadingAsFloat < 0)
+            {
+                currentHeadingAsFloat += 360;
+            }
+
+            return new Heading(currentHeadingAsFloat);
+        }
     }
 }

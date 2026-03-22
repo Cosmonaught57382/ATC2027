@@ -9,11 +9,11 @@ namespace ATC2027.DataStructures
 {
     public class EventBasedList<T> : IList<T>
     {
-        private List<T> _list;
+        private readonly List<T> _list;
 
         public event EventHandler<EventArgs> ItemAdded;
         public event EventHandler<EventArgs> ItemRemoved;
-        public event EventHandler<EventArgs> ItemSettedByIndex;
+        public event EventHandler<EventArgs> ItemHasBeenSetByIndexAccess;
 
         public EventBasedList() {
             this._list = [];
@@ -21,10 +21,17 @@ namespace ATC2027.DataStructures
 
         public EventBasedList(ICollection<T> collection)
         {
-            this._list = collection.ToList();
+            this._list = [.. collection];
         }
 
-        public T this[int index] { get => _list[index]; set => value = _list[index]; }
+        public T this[int index]
+        {
+            get => _list[index];
+            set
+            {
+                value = _list[index];
+            }
+        }
 
         public int Count => _list.Count;
 

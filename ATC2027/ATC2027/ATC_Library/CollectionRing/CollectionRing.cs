@@ -74,9 +74,10 @@ namespace ATC2027.ATC_Library.CollectionRing
 
         internal Plane? GetPlaneByFlightNumber(string flightNumber)
         {
-            Plane? plane;
-            if (!planeCollection.TryGetValue(flightNumber, out plane))
+            if (!planeCollection.TryGetValue(flightNumber, out Plane plane))
+            {
                 plane = null;
+            }
 
             return plane;
         }

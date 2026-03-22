@@ -4,19 +4,19 @@ using System.Collections.Generic;
 using ATC2027.Library.FlightNumber;
 using ATC2027.Library.Altitude;
 using ATC2027.Library.Speed;
-using System.Text;
-using ATC2027.Controls;
 using System.Linq;
 using ATC2027.Forms;
 using ATC2027.ATC_Library.Heading;
 using ATC2027.ATC_Library.CollectionRing;
+using System;
+using Microsoft.Xna.Framework.Input;
 
 namespace ATC2027.State
 {
     public class Game : AState
     {
         #region game        
-        int indexOfSelectedPlane;
+        int indexOfSelectedPlane = -1;
         CollectionRing cr;
         #endregion
 
@@ -38,9 +38,9 @@ namespace ATC2027.State
             if (cr.planeCollection.Count == 0)
 
                 cr.AddPlane(new Plane(
-                    new FlightNumber("BA3441"),
+                    new FlightNumber("EJ3422"),
                     new Heading(090f),
-                    new Altitude(7539),
+                    new Altitude(8000),
                     new Speed(240f),
                     new Vector2(125, 250),
                     Constants.getSpriteBatch().GraphicsDevice
@@ -84,7 +84,36 @@ namespace ATC2027.State
             foreach(var plane in cr.planeCollection)
                 plane.Value.Update(gameTime);
 
+            
+            //Testing heading alterations and movement changes.
+            Plane selectedPlane = GetSelectedPlane();
+            
+            if (selectedPlane != null) {
+                bool leftArrowDown = Constants.getKeyboardState().IsKeyDown(Keys.Left);
+                bool rightArrowDown = Constants.getKeyboardState().IsKeyDown(Keys.Right);
+
+                if (leftArrowDown)
+                    selectedPlane.DecrementHeading();
+                else if (rightArrowDown)
+                    selectedPlane.IncrementHeading();
+            }
+
             base.Update(gameTime);
+        }
+        /// <summary>
+        /// Returns the selected plane which is determined by the variable planeCollection and indexOfSelectedPlane. 
+        /// If these values are not compatible and cause an exception to be thrown, null is returned
+        /// </summary>
+        /// <returns></returns>
+        private Plane? GetSelectedPlane()
+        {
+            try
+            {
+                return cr.planeCollection.Values.ToArray()[indexOfSelectedPlane];
+            }
+            catch (Exception) {}
+
+            return null;
         }
 
         public void AddPlane(Plane plane)

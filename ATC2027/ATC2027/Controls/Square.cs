@@ -23,16 +23,15 @@ namespace ATC2027.Controls
         Texture2D texture;
         int textureLength;
         int lengthOfSquare;
+        Color color;
         public Square(Vector2 topLeftCornerOfSquare, int length, GraphicsDevice graphicsDevice, Color? color = null)
         {
             this.lengthOfSquare = length;
 
-            if (color == null)
-                color = Color.White;
-            
+            this.color = color == null ? Color.White : (Color)color;
             base.position = topLeftCornerOfSquare;
             textureLength = length;
-            texture = createTexture(length, graphicsDevice, (Color)color);
+            texture = createTexture(length, graphicsDevice, this.color);
         }
         public Int64? GetSize() => textureLength;
 
@@ -55,33 +54,39 @@ namespace ATC2027.Controls
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, base.position, Color.White);
+            spriteBatch.Draw(texture, base.position, color);
         }
 
         public override void Update(GameTime gameTime)
         {
-            float multiplier = 0.15f;
-            float constant = 1f;
+            bool allowArrowControlOverPlane = false;
 
-            float movementAmount = multiplier * constant;
-
-            bool down = Keyboard.GetState().IsKeyDown(Keys.Down);
-            bool up = Keyboard.GetState().IsKeyDown(Keys.Up);
-            bool left = Keyboard.GetState().IsKeyDown(Keys.Left);
-            bool right = Keyboard.GetState().IsKeyDown(Keys.Right);
-
-            float totalYMovement = (up ? -movementAmount : 0) + (down ? movementAmount : 0);
-            float totalXMovement = (left ? -movementAmount : 0) + (right ? movementAmount : 0);
-
-            //see if the square should move diagonally
-            if (totalYMovement != 0f && totalXMovement != 0f)
+            if (allowArrowControlOverPlane)
             {
-                // enable diagonal movement at roughly same speed as horizontal/vertical movement - needs to be exact at some point
-                totalXMovement /= 2;
-                totalYMovement /= 2;
-            }
+                float multiplier = 0.15f;
+                float constant = 1f;
 
-            this.IncrementLocation(totalXMovement, totalYMovement);            
+                float movementAmount = multiplier * constant;
+
+                bool down = Keyboard.GetState().IsKeyDown(Keys.Down);
+                bool up = Keyboard.GetState().IsKeyDown(Keys.Up);
+                bool left = Keyboard.GetState().IsKeyDown(Keys.Left);
+                bool right = Keyboard.GetState().IsKeyDown(Keys.Right);
+
+                float totalYMovement = (up ? -movementAmount : 0) + (down ? movementAmount : 0);
+                float totalXMovement = (left ? -movementAmount : 0) + (right ? movementAmount : 0);
+
+                //see if the square should move diagonally
+                if (totalYMovement != 0f && totalXMovement != 0f)
+                {
+                    // enable diagonal movement at roughly same speed as horizontal/vertical movement - needs to be exact at some point
+                    totalXMovement /= 2;
+                    totalYMovement /= 2;
+                }
+    
+                this.IncrementLocation(totalXMovement, totalYMovement);
+            }
+            
         }
 
         public Vector2 GetLocation()
@@ -97,6 +102,16 @@ namespace ATC2027.Controls
         internal int getLength()
         {
             return this.lengthOfSquare; 
+        }
+
+        public void SetCentre(Vector2 newCentreOfHead)
+        {
+            base.position = new Vector2(newCentreOfHead.X - this.lengthOfSquare / 2, newCentreOfHead.Y - this.lengthOfSquare / 2);
+        }
+
+        internal void SetColor(Color color)
+        {
+            this.color = color;
         }
     }
 }
