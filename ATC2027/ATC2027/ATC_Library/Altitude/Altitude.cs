@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Content;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,9 +35,37 @@ namespace ATC2027.Library.Altitude
             return (int)(feet);
         }
 
-        public string GetAltitudeAsFlightLevel()
+        public string GetAltitudeAsFlightLevel(int numberOfDigitsAfterTheDecimalPoint = 0)
         {
-            return (GetAltitudeInFeet() / 1000).ToString();
+            float altitudeInFeet = GetAltitudeInFeet();
+            float altitudeAsFlightLevel = altitudeInFeet / 1000;
+
+            string altitudeAsFlightLevelAsString = altitudeInFeet.ToString();
+
+            string[] split = altitudeAsFlightLevelAsString.Split('.');
+            bool altitudeAsFlightLevelHasDigitsAfterDecimalPoint = split.Length == 2;
+
+            if (altitudeAsFlightLevelHasDigitsAfterDecimalPoint)
+            {
+                int noOfShifts = 0;
+                while (noOfShifts < numberOfDigitsAfterTheDecimalPoint)
+                {
+                    altitudeAsFlightLevel *= 10;
+                    noOfShifts++;
+                }
+                double a = Math.Truncate((double)altitudeAsFlightLevel);
+                while (noOfShifts > 0)
+                {
+                    altitudeAsFlightLevel /= 10;
+                    noOfShifts--;
+                }
+                altitudeAsFlightLevelAsString = altitudeAsFlightLevel.ToString();
+            }
+            else
+            {
+                return altitudeAsFlightLevel.ToString();
+            }
+            return altitudeAsFlightLevelAsString;
 
         }
         public string ToString() {
@@ -55,7 +84,7 @@ namespace ATC2027.Library.Altitude
 
             if (GetAltitudeInFeet() > 5000)
             {
-                this.memoizedToString = "fl " + GetAltitudeAsFlightLevel().ToString();
+                this.memoizedToString = "fl " + GetAltitudeAsFlightLevel(2).ToString();
             }
             else
             {
@@ -88,6 +117,21 @@ namespace ATC2027.Library.Altitude
 
 
             
+        }
+
+        public IAltitude Decrement(float rateOfDescentPerPeriod = 1f)
+        {
+            return new Altitude(this.feet - rateOfDescentPerPeriod);
+        }
+
+        public IAltitude Increment(float rateOfDescentPerPeriod = 1f)
+        {
+            return new Altitude(this.feet + rateOfDescentPerPeriod);
+        }
+
+        public string GetAltitudeAsFlightLevel()
+        {
+            return GetAltitudeAsFlightLevel(0);
         }
     }
 }

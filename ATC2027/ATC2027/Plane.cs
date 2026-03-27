@@ -52,6 +52,9 @@ namespace ATC2027
         IAltitude altitude;
         VerticalMovement.VerticalMovementEnum verticalMovement;
         bool updateAltitudeNow;
+        TimeSpan altitudeUpdateFrequency = TimeSpan.FromMilliseconds(100);
+        float rateOfDescentPerPeriod = 1f;
+        TimeSpan lastAltitudeUpdate;
         //Speed
         ISpeed speed;
         bool updateSpeedNow;
@@ -107,7 +110,7 @@ namespace ATC2027
 
         public float getTurningRadiusFromSpeed()
         {
-            return MathExtension.Map(this.speed.ToKnotsFloat()/500f,0.5,3);
+            return MathExtension.Map(this.speed.ToKnotsFloat()/500f,0.75,3);
             throw new ApplicationException("");
         }
 
@@ -178,6 +181,7 @@ namespace ATC2027
             tail.Update(gameTime);
             head.Update(gameTime);
 
+            #region updateHeading
             updateHeadingNow = lastHeadingUpdate + headingUpdateFrequency < gameTime.TotalGameTime;
             if (updateHeadingNow)
             {
@@ -185,9 +189,16 @@ namespace ATC2027
                 lastHeadingUpdate = gameTime.TotalGameTime;
                 updateHeadingNow = false;
             }
-                
-            
-            
+            #endregion
+
+            #region updateAltitude
+            updateAltitudeNow = lastAltitudeUpdate + altitudeUpdateFrequency < gameTime.TotalGameTime;
+            if (updateAltitudeNow) {
+                UpdateAltitude();
+                lastAltitudeUpdate = gameTime.TotalGameTime;
+                updateAltitudeNow = false;
+            }
+            #endregion
 
             if (isSelected)
             {
@@ -204,6 +215,32 @@ namespace ATC2027
                     this.heading.Increment();
                     attributesHaveBeenUpdated = true;
                 }
+            }
+        }
+
+        private void UpdateAltitude()
+        {
+            if (clearance == null)
+                return;
+
+            if (clearance.GetAltitude() == null)
+                return;
+
+            float clearanceAltitude = clearance.GetAltitude().GetAltitudeInFeet();
+            float actualAltitude = this.altitude.GetAltitudeInFeet();
+
+            bool clearanceAltitudeAndRealAltitudeAreDifferent = clearanceAltitude == actualAltitude;
+            //update heading
+            if (!clearanceAltitudeAndRealAltitudeAreDifferent)
+            {
+                if (Math.Abs(clearanceAltitude - actualAltitude) < 1)
+                    altitude = clearance.GetAltitude();
+                else if (clearanceAltitude < actualAltitude)
+                    altitude = altitude.Decrement(rateOfDescentPerPeriod);
+                else
+                    altitude = altitude.Increment(rateOfDescentPerPeriod);
+
+                this.attributesHaveBeenUpdated = true;
             }
         }
 
