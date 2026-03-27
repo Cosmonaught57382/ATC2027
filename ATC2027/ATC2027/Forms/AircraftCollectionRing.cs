@@ -65,7 +65,7 @@ namespace ATC2027.Forms
             statusBoardItemList.ItemAdded += UpdateDataGridViewOfSelectedTabIndex;
             statusBoardItemList.ItemRemoved += UpdateDataGridViewOfSelectedTabIndex;
             statusBoardItemList.ItemHasBeenSetByIndexAccess += UpdateDataGridViewOfSelectedTabIndex;
-            statusBoardItemList.ItemHasBeenModified += UpdateForm;
+            //statusBoardItemList.ItemHasBeenModified += UpdateForm;
         }
         public void UpdateStatusBoardItemList() 
         {
