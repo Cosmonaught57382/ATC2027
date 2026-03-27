@@ -4,12 +4,10 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/danUser/Desktop/ATC2027/ATC2027/ATC2027/Content/Arial_12.spritefont</File>
-    <File>C:/Users/danUser/Desktop/ATC2027/ATC2027/ATC2027/Content/Arial_7.spritefont</File>
-    <File>C:/Users/danUser/Desktop/ATC2027/ATC2027/ATC2027/Content/gameFont.spritefont</File>
+    <File>C:/Users/danUser/Desktop/B/ATC2027/ATC2027/ATC2027/Content/Arial_12.spritefont</File>
+    <File>C:/Users/danUser/Desktop/B/ATC2027/ATC2027/ATC2027/Content/Arial_7.spritefont</File>
   </SourceFiles>
   <DestFiles>
-    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
