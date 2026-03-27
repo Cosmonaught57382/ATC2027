@@ -28,6 +28,11 @@ namespace ATC2027.ATC_Library.Heading
             this.v = heading.GetHeadingInFloatDegrees();
         }
 
+        public IHeading Decrement(float val = 1f)
+        {
+            return new Heading(this.v-val);
+        }
+
         public float GetHeadingInFloatDegrees()
         {
             return v;
@@ -37,6 +42,11 @@ namespace ATC2027.ATC_Library.Heading
         {
             return (int)v;
 
+        }
+
+        public IHeading Increment(float val = 1f)
+        {
+            return new Heading(v+val);
         }
 
         public override string ToString() { 
@@ -52,6 +62,11 @@ namespace ATC2027.ATC_Library.Heading
         internal float GetHeadingInFloatRadians()
         {
             return MathHelper.ToRadians(v-90);
+        }
+
+        double IHeading.GetHeadingInFloatRadians()
+        {
+            return GetHeadingInFloatRadians();
         }
 
         public static Heading operator ++(Heading operand)

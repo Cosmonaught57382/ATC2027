@@ -33,6 +33,8 @@ namespace ATC2027.ATC_Library.Clearance
         /// Emptys the object of all clearances
         /// </summary>
         void Empty();
-
+        IHeading GetHeading();
+        ISpeed GetSpeed();
+        IAltitude GetAltitude();
     }
 }

@@ -50,5 +50,20 @@ namespace ATC2027.ATC_Library.Clearance
         {
             return new Clearance(null, null, null);
         }
+
+        public IHeading GetHeading()
+        {
+            return Heading;
+        }
+
+        public ISpeed GetSpeed()
+        {
+            return speed;
+        }
+
+        public IAltitude GetAltitude()
+        {
+            return altitude;
+        }
     }
 }

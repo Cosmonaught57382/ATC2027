@@ -35,5 +35,10 @@ namespace ATC2027.Library.Speed
         {
             return ToKnots().ToString() + "kt";
         }
+
+        public float ToKnotsFloat()
+        {
+            return (float)knots;
+        }
     }
 }

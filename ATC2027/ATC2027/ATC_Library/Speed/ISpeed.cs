@@ -5,5 +5,6 @@
         int ToKnots();
         ISpeed FromKnots();
         abstract string ToString();
+        float ToKnotsFloat();
     }
 }
