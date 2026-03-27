@@ -22,6 +22,8 @@ namespace ATC2027.State
 
         #region forms
         AircraftCollectionRing aircraftCollectionRing;
+        TimeSpan formUpdateFrequency = TimeSpan.FromSeconds(1);
+        TimeSpan formLastUpdate = TimeSpan.Zero;
         #endregion
 
 
@@ -62,6 +64,8 @@ namespace ATC2027.State
             aircraftCollectionRing.Show();            
         }
 
+        public bool formShouldBeUpdated => cr.planeCollection.Values.Any(x => x.getAttributesHaveBeenUpdated());
+
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             foreach (var plane in cr.planeCollection) 
@@ -76,6 +80,15 @@ namespace ATC2027.State
 
         public override void Update(GameTime gameTime)
         {
+
+            if (gameTime.TotalGameTime - formLastUpdate > formUpdateFrequency)
+            {
+                formLastUpdate = gameTime.TotalGameTime;
+
+                if (aircraftCollectionRing.formShouldBeUpdated || formShouldBeUpdated)
+                    aircraftCollectionRing.UpdateForm();
+            }
+            
             if (cr.planeCollection.Count == 0)
             {
                 indexOfSelectedPlane = cr.planeCollection.Count - 1;

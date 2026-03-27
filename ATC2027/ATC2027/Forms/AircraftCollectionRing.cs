@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,8 +23,10 @@ namespace ATC2027.Forms
 {
     public partial class AircraftCollectionRing : Form
     {
+        public bool formShouldBeUpdated = false;
+
         private readonly CollectionRing cr;
-        private readonly EventBasedList<StatusBoardItem> statusBoardItemList;
+        private EventBasedList<StatusBoardItem> statusBoardItemList;
         private IList<StatusBoardItem> arrivalStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "arr")];
         private IList<StatusBoardItem> departureStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "dep")];
         private IList<StatusBoardItem> flyByStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "FlyOver")];
@@ -39,7 +42,7 @@ namespace ATC2027.Forms
 
             statusBoardItemList ??= [];
 
-            this.statusBoardItemList = [.. cr.getAircraftCollectionRingListItemsAsList()];
+            UpdateStatusBoardItemList();
 
             InitialiseDataGridView(ref dgvAllAircraft, this.statusBoardItemList);
 
@@ -62,9 +65,45 @@ namespace ATC2027.Forms
             statusBoardItemList.ItemAdded += UpdateDataGridViewOfSelectedTabIndex;
             statusBoardItemList.ItemRemoved += UpdateDataGridViewOfSelectedTabIndex;
             statusBoardItemList.ItemHasBeenSetByIndexAccess += UpdateDataGridViewOfSelectedTabIndex;
+            statusBoardItemList.ItemHasBeenModified += UpdateForm;
+        }
+        public void UpdateStatusBoardItemList() 
+        {
+            this.statusBoardItemList = [.. cr.getAircraftCollectionRingListItemsAsList()];
+        }
+        public void UpdateForm(object sender = null, EventArgs? e = null)
+        {
+            //set e to empty if e is null, good practice atm, e isn't accessed or used yet.
+            e ??= EventArgs.Empty;
+            
+            //get the current index
+            int index = tabControl.TabIndex;
+            
+            DataGridView dgv;
+            try
+            {
+                dgv = tabIndexAndDataGridView[index];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                MessageBox.Show($"The {nameof(tabIndexAndDataGridView)} didn't have an item at index {tabControl.TabIndex}");
+                return;
+            }
+
+            UpdateStatusBoardItemList();
+            dgv.Invalidate();
+            UpdateDataGridViewOfSelectedTabIndex(sender, new FromUpdateFormFunctionCall(e));
+        }
+        
+        public class FromUpdateFormFunctionCall : EventArgs {
+            EventArgs? previousEventArgs;
+
+            public FromUpdateFormFunctionCall(EventArgs e) {
+                previousEventArgs = e;
+            }
         }
 
-        private void UpdateDataGridViewOfSelectedTabIndex(object sender, EventArgs? e = null)
+        private void UpdateDataGridViewOfSelectedTabIndex(object sender = null, EventArgs? e = null)
         {
             //set e to empty if e is null, good practice atm, e isn't accessed or used yet.
             e ??= EventArgs.Empty;
@@ -95,7 +134,7 @@ namespace ATC2027.Forms
                 DialogResult dialogResult = MessageBox.Show($"The {nameof(tabIndexAndFunctionThatGetsStatusBoardItems)} didn't have an item at index {tabControl.TabIndex}");
                 return;
             }
-
+            dgv.Invalidate();
             InitialiseDataGridView(ref dgv, funcThatGetsStatusBoardItems());
         }
 
@@ -182,140 +221,163 @@ namespace ATC2027.Forms
 
         private void btnApplyClearance_Click(object sender, EventArgs e)
         {
-            //validate heading
+            string errorMessage = "";
 
+            bool speedIsValid = SpeedIsValid(ref errorMessage);
+            bool altitudeIsValid = AltitudeIsValid(ref errorMessage);
+            bool headingIsValid = HeadingIsValid(ref errorMessage);
+            bool flightNumberIsValid = FlightNumberIsValid(ref errorMessage);
 
-            bool headingIsValid;
-            //heading is an integer larger than -1 and smaller than 361
-            try
+            if (!(speedIsValid && altitudeIsValid && headingIsValid && flightNumberIsValid))
             {
-                var val = Int128.Parse(txtBoxHeading.Text);
-                headingIsValid = val < 361 && val > -1;
+                lblResult.Text = errorMessage;
             }
-            catch (Exception) { 
-                headingIsValid = false;
-            }
-            //validate altitude
+            else {
+                IClearance clearance = Clearance.getEmptyClearance();
 
+                if (txtBoxHeading.Text != "")
+                    clearance.ApplyHeading(new Heading(txtBoxHeading.Text));
+                if (txtBoxSpeed.Text != "")
+                    clearance.ApplySpeed(new Speed(txtBoxSpeed.Text));
+                if (txtBoxAltitude.Text != "")
+                    clearance.ApplyAltitude(new Altitude(txtBoxAltitude.Text, cmbBoxAltitudeType));
 
-            bool altitudeIsInFeet, altitudeIsValid = true;
-            try
-            {
-                if (cmbBoxAltitudeType.SelectedItem == null)
-                    throw new Exception();
-
-                altitudeIsInFeet = cmbBoxAltitudeType.SelectedItem.ToString().ToLower() == "feet";
-
-                //altitude in feet is larger than 0 and less than 100000
-                if (altitudeIsInFeet)
+                //apply clearance here
+                Plane plane;
+                try
                 {
-                    try
-                    {
-                        var val = Int128.Parse(txtBoxHeading.Text);
-                        altitudeIsValid = val < 100000 && val > -1;
-                    }
-                    catch (Exception)
-                    {
-                        headingIsValid = false;
-                    }
+                    plane = cr.GetPlaneByFlightNumber(cmbBoxSelectAircraft.Text);
                 }
-                else
+                catch (Exception)
                 {
-                    //altitude in flight level is larger than 0 and less than 100
-                    try
+
+                    DialogResult result = MessageBox.Show(this, $"Unable to find {cmbBoxSelectAircraft.Text}", "Warning", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Cancel) { return; }
+                    else if (result == DialogResult.Retry)
+                        btnApplyClearance_Click(this, new EventArgs());
+                    else
                     {
-                        var val = Int128.Parse(txtBoxHeading.Text);
-                        altitudeIsValid = val < 100 && val > -1;
+                        MessageBox.Show(this, $"Dialogue result {result} not handled", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    catch (Exception)
-                    {
-                        headingIsValid = false;
-                    }
+                    return;
                 }
-            }
-            catch (Exception)
-            {
-                altitudeIsValid = false;
-            }
 
+                this.cr.ApplyClearance(clearance, ref plane);
 
-            //validate speed
+                //clear text boxes and combo boxes
+                lblResult.Text = "clearance applied";
+                txtBoxAltitude.Text = "";
+                txtBoxHeading.Text = "";
+                txtBoxSpeed.Text = "";
+                cmbBoxAltitudeType.Text = "";
+                cmbBoxSelectAircraft.Text = "";
+            } 
+        }
+        
 
+        private bool FlightNumberIsValid(ref string errorMessage)
+        {
+            bool result = cmbBoxSelectAircraft.Items.Contains(cmbBoxSelectAircraft.Text);
+            if (!result)
+                errorMessage = "flight number could not be found";
 
+            return result;
+
+        }
+
+        private bool SpeedIsValid(ref string errorMessage)
+        {
             bool speedIsValid;
             //speed is larger than 0 and less than 400
             try
             {
                 var val = Int128.Parse(txtBoxSpeed.Text);
+                
                 speedIsValid = val < 400 && val > 50;
+                if (!speedIsValid)
+                    errorMessage = "speed was out of the range";
+
+                return speedIsValid;
             }
             catch (Exception)
             {
-                speedIsValid = false;
+                if (txtBoxSpeed.Text != "")
+                {
+                    errorMessage = "speed was not a number";
+                    return false;
+                }
+                return true;
+
             }
-            //validate flight number
+        }
 
+        private bool AltitudeIsValid(ref string errorMessage)
+        {
+            if (cmbBoxAltitudeType.SelectedItem == null)
+            {
+                errorMessage = "Altitude type was not selected";
+                return txtBoxAltitude.Text == "";
+            }
+                
 
-            bool flightNumberIsValid = cmbBoxSelectAircraft.Items.Contains(cmbBoxSelectAircraft.Text);
-            //a valid flight number has been selected
+            bool altitudeIsInFeet = cmbBoxAltitudeType.Text.ToLower() == "feet";
             
+            //altitude in feet is larger than 0 and less than 100000
+            if (altitudeIsInFeet)
+            {
+                try
+                {
+                    var val = Int128.Parse(txtBoxHeading.Text);
+                    return val < 100000 && val > -1;
+                }
+                catch (Exception)
+                {
+                    return txtBoxHeading.Text == "";
+                }
+            }
+            else
+            {
+               //altitude in flight level is larger than 0 and less than 100
+                try
+                {
+                   var val = Int128.Parse(txtBoxHeading.Text);
+                   return val < 100 && val > -1;
+                }
+                catch (Exception)
+                {
+                   return txtBoxHeading.Text == "";
+                }               
+            }
+        }
 
-            //validity checks
-            if (!flightNumberIsValid)
-            {
-                lblResult.Text = "Flight Number was not valid";
-                return;
-            }
-            if (!speedIsValid)
-            {
-                lblResult.Text = "Speed was not valid";
-                return;
-            }
-            if (!altitudeIsValid)
-            {
-                lblResult.Text = "Altitude was not valid";
-                return;
-            }
-            if (!headingIsValid)
-            {
-                lblResult.Text = "Heading was not valid";
-                return;
-            }
-            lblResult.Text = "";
-
-            IClearance clearance = Clearance.getEmptyClearance().
-                ApplyHeading(new Heading(txtBoxHeading.Text)).
-                ApplySpeed(new Speed(txtBoxSpeed.Text)).
-                ApplyAltitude(new Altitude(txtBoxAltitude.Text,cmbBoxAltitudeType));
-            //apply clearance here
-            Plane plane;
+        private bool HeadingIsValid(ref string errorMessage)
+        {
+            //heading is an integer larger than -1 and smaller than 361
+            bool headingIsOutsideTheRange;
+            bool isValid;
             try
             {
-                plane = cr.GetPlaneByFlightNumber(cmbBoxSelectAircraft.Text);
-            }
-            catch (Exception) {
-                
-                DialogResult result = MessageBox.Show(this, $"Unable to find {cmbBoxSelectAircraft.Text}","Warning",MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
+                var val = Int128.Parse(txtBoxHeading.Text);
+                headingIsOutsideTheRange = !(val < 361 && val > -1);
 
-                if (result == DialogResult.Cancel) { return; }
-                else if (result == DialogResult.Retry)
-                    btnApplyClearance_Click(this, new EventArgs());
-                else
+                if (headingIsOutsideTheRange)
                 {
-                    MessageBox.Show(this, $"Dialogue result {result} not handled", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    errorMessage = "heading was outside the range";
+                    return false;
                 }
-                return;
+                return true;
             }
+            catch (Exception)
+            {
+                
+                var result = (txtBoxHeading.Text == "");
 
-            this.cr.ApplyClearance(clearance, ref plane);
+                if (!result)
+                    errorMessage = "heading was not a number";
 
-            //clear text boxes and combo boxes
-            lblResult.Text = "clearance applied";
-            txtBoxAltitude.Text = "";
-            txtBoxHeading.Text = "";
-            txtBoxSpeed.Text = "";
-            cmbBoxAltitudeType.Text = "";
-            cmbBoxSelectAircraft.Text = "";
+                return result;
+            }
         }
 
         private void UpdateCmbBoxSelectAircraft()

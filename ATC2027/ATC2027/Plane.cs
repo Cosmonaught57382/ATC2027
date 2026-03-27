@@ -19,6 +19,7 @@ namespace ATC2027
 {
     public class Plane : MoveableItem, IHasDevModeDrawableString
     {
+        bool attributesHaveBeenUpdated;
 
         Vector2 location;
         IClearance clearance;
@@ -50,12 +51,17 @@ namespace ATC2027
         //Altitude
         IAltitude altitude;
         VerticalMovement.VerticalMovementEnum verticalMovement;
+        bool updateAltitudeNow;
         //Speed
         ISpeed speed;
+        bool updateSpeedNow;
         //FlightNumber
         FlightNumber flightNumber;
         //Heading
-        Heading heading;
+        IHeading heading;
+        bool updateHeadingNow;
+        TimeSpan headingUpdateFrequency = TimeSpan.FromMilliseconds(250);
+        TimeSpan lastHeadingUpdate;
         #region vertical movement enum and method
 
         enum FlightRelationToAirfield
@@ -99,14 +105,16 @@ namespace ATC2027
             previousLastAppendageToPreviousLocations = lastAppendageToPreviousLocations;
         }
 
+        public float getTurningRadiusFromSpeed()
+        {
+            return MathExtension.Map(this.speed.ToKnotsFloat()/500f,0.5,3);
+            throw new ApplicationException("");
+        }
+
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             head.Draw(gameTime, spriteBatch);
-
-            if (tail.ShouldBeDrawn())
-                tail.Draw(gameTime, spriteBatch);
-            else
-                Console.WriteLine("tail is not being drawn due to the tail.ShouldBeDrawn() function returning false. This results in this message being printed");
+            tail.Draw(gameTime, spriteBatch);
             
             DrawTopLine(spriteBatch, ref head);
             DrawBottomLine(spriteBatch, ref head);
@@ -170,8 +178,17 @@ namespace ATC2027
             tail.Update(gameTime);
             head.Update(gameTime);
 
+            updateHeadingNow = lastHeadingUpdate + headingUpdateFrequency < gameTime.TotalGameTime;
+            if (updateHeadingNow)
+            {
+                UpdateHeading();
+                lastHeadingUpdate = gameTime.TotalGameTime;
+                updateHeadingNow = false;
+            }
+                
+            
+            
 
-            //update heading
             if (isSelected)
             {
                 bool leftArrowDown = false;
@@ -179,21 +196,58 @@ namespace ATC2027
 
                 if (leftArrowDown)
                 {
-                    this.heading--;
+                    this.heading.Decrement();
+                    attributesHaveBeenUpdated = true;
                 }
                 if (rightArrowDown)
                 {
-                    this.heading++;
+                    this.heading.Increment();
+                    attributesHaveBeenUpdated = true;
                 }
             }
-
         }
+
+        private void UpdateHeading()
+        {
+            if (clearance == null)
+                return;
+
+            if (clearance.GetHeading() == null)
+                return;
+            float clearanceHeading = clearance.GetHeading().GetHeadingInFloatDegrees();
+            float actualHeading = this.heading.GetHeadingInFloatDegrees();
+
+            bool clearanceHeadingAndHeadingAreDifferent = clearanceHeading == actualHeading;
+            //update heading
+            if (!clearanceHeadingAndHeadingAreDifferent)
+            {
+                if (Math.Abs(clearanceHeading - actualHeading) < 1)
+                    heading = clearance.GetHeading();
+                else if (clearanceHeading < actualHeading)
+                    heading = heading.Decrement(getTurningRadiusFromSpeed());
+                else
+                    heading = heading.Increment(getTurningRadiusFromSpeed());
+
+                this.attributesHaveBeenUpdated = true;
+            }
+        }
+
+        public bool getAttributesHaveBeenUpdated()
+        {
+            return this.attributesHaveBeenUpdated;
+        }
+
+        public void setAttributesHaveBeenUpdated(bool changeInAttributesHasBeenHandled)
+        {
+            this.attributesHaveBeenUpdated = changeInAttributesHasBeenHandled;
+        }
+
         private void UpdateHeadInformation(GameTime gameTime)
         {
             if (head is null)
                 return;
             
-            float magnitudeOfMovement = (float)gameTime.ElapsedGameTime.Nanoseconds / 1000f;
+            float magnitudeOfMovement = (float)gameTime.ElapsedGameTime.Nanoseconds / 5000f;
             Vector2 directionOfMovement = new Vector2(
                 (float)Math.Cos(heading.GetHeadingInFloatRadians()),
                 (float)Math.Sin(heading.GetHeadingInFloatRadians())
@@ -311,12 +365,14 @@ namespace ATC2027
         }
         internal void DecrementHeading()
         {
-            this.heading--;
+            this.attributesHaveBeenUpdated = true;
+            this.heading.Decrement();
         }
 
         internal void IncrementHeading()
         {
-            this.heading++;
+            this.attributesHaveBeenUpdated = true;
+            this.heading.Increment();
         }
     }
 }

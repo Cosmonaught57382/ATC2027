@@ -29,6 +29,7 @@ namespace ATC2027.State
 
         public virtual void Update(GameTime gameTime)
         {
+            /*
             #region enabling the press toggle of dev mode
             prevLeftCtrlIsDown = leftCtrlIsDown;
             prevLeftShiftIsDown = leftShiftIsDown;
@@ -39,7 +40,8 @@ namespace ATC2027.State
             if (leftCtrlIsDown && leftShiftIsDown && !prevLeftCtrlIsDown && !prevLeftShiftIsDown)
                 Constants.DevMode = !Constants.DevMode;
             #endregion
-
+            */
+            /*
             if (Constants.DevMode)
             {
                 if (Constants.contentManager != null)
@@ -48,6 +50,7 @@ namespace ATC2027.State
                 if (devModeText!=null)
                     devModeText.setText(getDevModeDrawableString());
             }
+            */
 
         }
 

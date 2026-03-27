@@ -9,7 +9,7 @@ namespace ATC2027
 {
     public class Constants
     {   
-        public static bool DevMode = false;
+        public static bool DevMode = true;
         #region colors
         public static Color background => Color.CornflowerBlue;
         public static Color planeColor => Color.White;
