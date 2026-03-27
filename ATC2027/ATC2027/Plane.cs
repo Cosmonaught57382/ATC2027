@@ -58,6 +58,9 @@ namespace ATC2027
         //Speed
         ISpeed speed;
         bool updateSpeedNow;
+        TimeSpan lastSpeedUpdate;
+        TimeSpan speedUpdateFrequency = TimeSpan.FromMilliseconds(100);
+        float speedUpdateRate = 0.5f;
         //FlightNumber
         FlightNumber flightNumber;
         //Heading
@@ -200,6 +203,16 @@ namespace ATC2027
             }
             #endregion
 
+            #region updateSpeed
+            updateSpeedNow = lastSpeedUpdate + speedUpdateFrequency < gameTime.TotalGameTime;
+            if (updateSpeedNow)
+            {
+                UpdateSpeed();
+                lastSpeedUpdate = gameTime.TotalGameTime;
+                updateSpeedNow = false;
+            }
+            #endregion
+
             if (isSelected)
             {
                 bool leftArrowDown = false;
@@ -215,6 +228,31 @@ namespace ATC2027
                     this.heading.Increment();
                     attributesHaveBeenUpdated = true;
                 }
+            }
+        }
+
+        private void UpdateSpeed()
+        {
+            if (clearance == null)
+                return;
+            if (clearance.GetSpeed() == null)
+                return;
+
+            float clearanceSpeed = clearance.GetSpeed().ToKnotsFloat();
+            float actualSpeed = this.speed.ToKnotsFloat();
+
+            bool clearanceSpeedAndActualSpeedAreDifferent = clearanceSpeed == actualSpeed;
+            
+            if (!clearanceSpeedAndActualSpeedAreDifferent)
+            {
+                if (Math.Abs(clearanceSpeed - actualSpeed) < speedUpdateRate+0.1)
+                    speed = clearance.GetSpeed();
+                else if (clearanceSpeed < actualSpeed)
+                    speed = speed.Decrement(speedUpdateRate);
+                else
+                    speed = speed.Increment(speedUpdateRate);
+                
+                this.attributesHaveBeenUpdated = true;
             }
         }
 
@@ -284,7 +322,7 @@ namespace ATC2027
             if (head is null)
                 return;
             
-            float magnitudeOfMovement = (float)gameTime.ElapsedGameTime.Nanoseconds / 5000f;
+            float magnitudeOfMovement = (float)gameTime.ElapsedGameTime.Nanoseconds / 500000f * this.speed.ToKnotsFloat();
             Vector2 directionOfMovement = new Vector2(
                 (float)Math.Cos(heading.GetHeadingInFloatRadians()),
                 (float)Math.Sin(heading.GetHeadingInFloatRadians())

@@ -238,7 +238,20 @@ namespace ATC2027.Forms
                 if (txtBoxHeading.Text != "")
                     clearance.ApplyHeading(new Heading(txtBoxHeading.Text));
                 if (txtBoxSpeed.Text != "")
-                    clearance.ApplySpeed(new Speed(txtBoxSpeed.Text));
+                {
+                    float speedInKnots;
+                    try
+                    {
+                        speedInKnots = int.Parse(txtBoxSpeed.Text);
+                        clearance.ApplySpeed(new Speed(speedInKnots));
+                    }
+                    catch (Exception)
+                    {
+                        //this should never happen, validation is done by the function SpeedIsValid
+                        MessageBox.Show(this,$"the given speed ({txtBoxSpeed.Text}) could not be converted to a float","Error",MessageBoxButtons.OK);
+                        txtBoxSpeed.Text = "";
+                    }
+                }
                 if (txtBoxAltitude.Text != "")
                     clearance.ApplyAltitude(new Altitude(txtBoxAltitude.Text, cmbBoxAltitudeType));
 

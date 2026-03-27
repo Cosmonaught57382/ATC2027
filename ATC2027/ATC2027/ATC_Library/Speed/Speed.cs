@@ -9,16 +9,10 @@ namespace ATC2027.Library.Speed
     public class Speed : ISpeed
     {
         private float knots;
-        private string text;
 
         public Speed(float knots)
         {
             this.knots = knots;
-        }
-
-        public Speed(string text)
-        {
-            this.text = text;
         }
 
         public int ToKnots()
@@ -39,6 +33,15 @@ namespace ATC2027.Library.Speed
         public float ToKnotsFloat()
         {
             return (float)knots;
+        }
+
+        public ISpeed Increment(float val = 1)
+        {
+            return new Speed(knots + val);
+        }
+
+        public ISpeed Decrement(float val = 1) { 
+            return new Speed(knots - val);
         }
     }
 }
