@@ -38,5 +38,16 @@ namespace ATC2027.ExtensionClasses
             }
             return newStr;
         }
+
+        public static string GetFirstXCharactersFromString(ref string str, int numberOfCharactersToCopy)
+        {
+            string a = "";
+
+            for(int i = 0; i < numberOfCharactersToCopy; i++)
+            {
+                a += str[i];
+            }
+            return a;
+        }
     }
 }

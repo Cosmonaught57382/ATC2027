@@ -44,7 +44,7 @@ namespace ATC2027
         private static TimeSpan appendToPreviousLocationsFrequency = TimeSpan.FromMilliseconds(250); //the smaller this is the sooner the line drawing updates
 
         #region textual components
-        public string getTopLine() => this.altitude.GetAltitudeAsFlightLevel() + " " + VerticalMovement.ToString(VerticalMovement.VerticalMovementEnum.unknown) + " " + this.speed.ToKnots().ToString();
+        public string getTopLine() => this.altitude.GetAltitudeAsFlightLevel() + " " + VerticalMovement.ToString(this.verticalMovement) + " " + this.speed.ToKnots().ToString();
         public string getBottomLine() => flightNumber.ToString();
         #endregion
 
@@ -106,7 +106,7 @@ namespace ATC2027
                 Constants.getSpriteBatch().GraphicsDevice);
             tail = new Line(head.GetCentre(), head.GetCentre());
 
-            previousLocations = new MonogameTimeFilteredList<Vector2>(TimeSpan.FromSeconds(10), [head.GetCentre()], TimeSpan.Zero);
+            previousLocations = new MonogameTimeFilteredList<Vector2>(TimeSpan.FromSeconds(3), [head.GetCentre()], TimeSpan.Zero);
 
             previousLastAppendageToPreviousLocations = lastAppendageToPreviousLocations;
         }

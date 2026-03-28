@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using ATC2027.ExtensionClasses;
+using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace ATC2027.Library.Altitude
 
             string altitudeAsFlightLevelAsString = altitudeInFeet.ToString();
 
-            string[] split = altitudeAsFlightLevelAsString.Split('.');
+            string[] split = altitudeAsFlightLevel.ToString().Split('.');
             bool altitudeAsFlightLevelHasDigitsAfterDecimalPoint = split.Length == 2;
 
             if (altitudeAsFlightLevelHasDigitsAfterDecimalPoint)
@@ -53,13 +54,15 @@ namespace ATC2027.Library.Altitude
                     altitudeAsFlightLevel *= 10;
                     noOfShifts++;
                 }
-                double a = Math.Truncate((double)altitudeAsFlightLevel);
+                float a = (float)Math.Truncate((double)altitudeAsFlightLevel);
                 while (noOfShifts > 0)
                 {
                     altitudeAsFlightLevel /= 10;
                     noOfShifts--;
                 }
                 altitudeAsFlightLevelAsString = altitudeAsFlightLevel.ToString();
+                altitudeAsFlightLevelAsString = stringExtension.GetFirstXCharactersFromString(ref altitudeAsFlightLevelAsString, numberOfDigitsAfterTheDecimalPoint == 0 ? 1 : 2 + numberOfDigitsAfterTheDecimalPoint);
+
             }
             else
             {
@@ -84,7 +87,7 @@ namespace ATC2027.Library.Altitude
 
             if (GetAltitudeInFeet() > 5000)
             {
-                this.memoizedToString = "fl " + GetAltitudeAsFlightLevel(2).ToString();
+                this.memoizedToString = "fl " + GetAltitudeAsFlightLevel(1).ToString();
             }
             else
             {
