@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ATC2027.Library.Altitude
 {
@@ -23,7 +24,7 @@ namespace ATC2027.Library.Altitude
             this.hasChanged = false;
         }
 
-        public Altitude(string text, ComboBox cmbBoxAltitudeType)
+        public Altitude(string text, System.Windows.Forms.ComboBox cmbBoxAltitudeType)
         {
             if (cmbBoxAltitudeType.Text.ToLower() == "feet")
                 this.feet = int.Parse(text);
@@ -71,7 +72,8 @@ namespace ATC2027.Library.Altitude
             return altitudeAsFlightLevelAsString;
 
         }
-        public string ToString() {
+        public string ToString()
+        {
 
             if (hasChanged)
             {
@@ -92,11 +94,11 @@ namespace ATC2027.Library.Altitude
             else
             {
                 string str = GetAltitudeInFeet().ToString();
-                
+
 
                 Stack<char> charStack = new Stack<char>(str);
                 int numberOfItemsAdded = 0;
-                
+
                 for (int i = 0; i < charStack.Count; i++)
                 {
                     if (numberOfItemsAdded % 3 == 0 && numberOfItemsAdded != 0)
@@ -115,11 +117,11 @@ namespace ATC2027.Library.Altitude
 
                 this.memoizedToString += " ft";
             }
-                
 
 
 
-            
+
+
         }
 
         public IAltitude Decrement(float rateOfDescentPerPeriod = 1f)
@@ -136,5 +138,63 @@ namespace ATC2027.Library.Altitude
         {
             return GetAltitudeAsFlightLevel(0);
         }
+
+        public static bool AltitudeIsValid(ref string errorMessage, string text, AltitudeTypeEnum? altitudeType = null)
+        {
+            if (altitudeType == null)
+            {
+                errorMessage = "Altitude type was not selected";
+                return false;
+            }
+
+
+            switch (altitudeType)
+            {
+                case AltitudeTypeEnum.FlightLevel:
+                    try
+                    {
+                        var val = Int128.Parse(text);
+                        return val < 100 && val > -1;
+                    }
+                    catch (Exception)
+                    {
+                        return text == "";
+                    }
+                case AltitudeTypeEnum.Feet:
+                    try
+                    {
+                        var val = Int128.Parse(text);
+                        return val < 100000 && val > -1;
+                    }
+                    catch (Exception)
+                    {
+                        return text == "";
+                    }
+                default:
+                    throw new Exception("Altitude Type not yet supported");
+            }
+        }
+
+        public static AltitudeTypeEnum? AltitudeTypeEnumFromString(string text)
+        {
+            switch (text.ToLower())
+            {
+                case "":
+                    return null;
+                case "flight level":
+                    return AltitudeTypeEnum.FlightLevel;
+                case "feet":
+                    return AltitudeTypeEnum.Feet;
+                default:
+                    throw new Exception($"Could not parse {text}");
+            }
+        }
     }
-}
+        public enum AltitudeTypeEnum
+        {
+            FlightLevel,
+            Feet,
+        }
+    }
+
+    

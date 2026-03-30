@@ -43,5 +43,31 @@ namespace ATC2027.Library.Speed
         public ISpeed Decrement(float val = 1) { 
             return new Speed(knots - val);
         }
+
+        public static bool SpeedIsValid(ref string errorMessage, string str)
+        {
+            bool speedIsValid;
+            //speed is larger than 0 and less than 400
+            try
+            {
+                var val = Int128.Parse(str);
+
+                speedIsValid = val < 400 && val > 50;
+                if (!speedIsValid)
+                    errorMessage = "speed was out of the range";
+
+                return speedIsValid;
+            }
+            catch (Exception)
+            {
+                if (str != "")
+                {
+                    errorMessage = "speed was not a number";
+                    return false;
+                }
+                return true;
+
+            }
+        }
     }
 }

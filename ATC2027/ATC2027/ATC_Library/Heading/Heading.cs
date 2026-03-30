@@ -88,5 +88,33 @@ namespace ATC2027.ATC_Library.Heading
 
             return new Heading(currentHeadingAsFloat);
         }
+        public static bool HeadingIsValid(ref string errorMessage, string text)
+        {
+            //heading is an integer larger than -1 and smaller than 361
+            bool headingIsOutsideTheRange;
+            bool isValid;
+            try
+            {
+                var val = Int128.Parse(text);
+                headingIsOutsideTheRange = !(val < 361 && val > -1);
+
+                if (headingIsOutsideTheRange)
+                {
+                    errorMessage = "heading was outside the range";
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+
+                var result = (text == "");
+
+                if (!result)
+                    errorMessage = "heading was not a number";
+
+                return result;
+            }
+        }
     }
 }
