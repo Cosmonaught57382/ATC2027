@@ -24,6 +24,9 @@ namespace ATC2027.State
         AircraftCollectionRing aircraftCollectionRing;
         TimeSpan formUpdateFrequency = TimeSpan.FromSeconds(1);
         TimeSpan formLastUpdate = TimeSpan.Zero;
+
+        AddPlane addPlaneForm;
+        private TimeSpan collectionRingUpdateFrequency = TimeSpan.FromSeconds(1);
         #endregion
 
 
@@ -37,20 +40,6 @@ namespace ATC2027.State
 
             foreach (Plane plane in planeList) { cr.AddPlane(plane); }
 
-            if (cr.planeCollection.Count == 0)
-
-                cr.AddPlane(new Plane(
-                    new FlightNumber("EJ3422"),
-                    new Heading(090f),
-                    new Altitude(8000),
-                    new Speed(240f),
-                    new Vector2(125, 250),
-                    Constants.getSpriteBatch().GraphicsDevice
-                    )
-                );
-
-            
-
             indexOfSelectedPlane = cr.planeCollection.Count-1;
 
             //set up the aircraft collection ring form
@@ -61,7 +50,10 @@ namespace ATC2027.State
 
             
             aircraftCollectionRing = new AircraftCollectionRing(ref cr);
-            aircraftCollectionRing.Show();            
+            aircraftCollectionRing.Show();
+
+            addPlaneForm = new AddPlane(ref cr);
+            addPlaneForm.Show();
         }
 
         public bool formShouldBeUpdated => cr.planeCollection.Values.Any(x => x.getAttributesHaveBeenUpdated());
@@ -73,13 +65,13 @@ namespace ATC2027.State
             
             //speedTesting.Draw(gameTime, spriteBatch);
             
-
-            
             base.Draw(gameTime, spriteBatch);
         }
-
+        
         public override void Update(GameTime gameTime)
         {
+            if (!(cr is null) && gameTime.TotalGameTime - cr.getLastUpdate() > collectionRingUpdateFrequency)
+                cr.Update(gameTime);
 
             if (gameTime.TotalGameTime - formLastUpdate > formUpdateFrequency)
             {
@@ -120,13 +112,15 @@ namespace ATC2027.State
         /// <returns></returns>
         private Plane? GetSelectedPlane()
         {
-            try
-            {
-                return cr.planeCollection.Values.ToArray()[indexOfSelectedPlane];
-            }
-            catch (Exception) {}
+            if (indexOfSelectedPlane < 0)
+                return null;
+            var planeCollectionAsIndex = cr.planeCollection.Values.ToArray();
+            
+            if (planeCollectionAsIndex.Length < indexOfSelectedPlane)
+                return null;
 
-            return null;
+            return planeCollectionAsIndex[indexOfSelectedPlane];
+            
         }
 
         public void AddPlane(Plane plane)
@@ -141,12 +135,15 @@ namespace ATC2027.State
 
         public override string getDevModeDrawableString()
         {
+            string toReturn = "";
             if (indexOfSelectedPlane < 0)
-                return "selected plane is null";
-            if (indexOfSelectedPlane > cr.planeCollection.Count - 1)
-                return "indexOfSelectedPlane is too large";
+                toReturn = "selected plane is null";
+            else if (indexOfSelectedPlane > cr.planeCollection.Count - 1)
+                toReturn = "indexOfSelectedPlane is too large";
+            else
+                toReturn = cr.planeCollection.Values.ToList()[indexOfSelectedPlane].getDevModeDrawableString();
 
-            return cr.planeCollection.Values.ToList()[indexOfSelectedPlane].getDevModeDrawableString();
+            return $"{toReturn}\n{cr.getDevModeDrawableString()}";
         }
     }
 }

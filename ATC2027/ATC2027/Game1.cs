@@ -16,6 +16,10 @@ namespace ATC2027
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
+            
+            _graphics.PreferredBackBufferHeight = Constants.getHeightOfScreen;
+            _graphics.PreferredBackBufferWidth = Constants.getWidthOfScreen;
+
             this.currentState = new Loading();
             this.nextState = null;
             Content.RootDirectory = "Content";

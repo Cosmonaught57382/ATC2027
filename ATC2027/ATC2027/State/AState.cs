@@ -1,4 +1,5 @@
 ﻿using ATC2027.Controls;
+using ATC2027.Controls;
 using ATC2027.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -41,7 +42,7 @@ namespace ATC2027.State
                 Constants.DevMode = !Constants.DevMode;
             #endregion
             */
-            /*
+            
             if (Constants.DevMode)
             {
                 if (Constants.contentManager != null)
@@ -50,7 +51,7 @@ namespace ATC2027.State
                 if (devModeText!=null)
                     devModeText.setText(getDevModeDrawableString());
             }
-            */
+            
 
         }
 

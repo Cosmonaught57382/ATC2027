@@ -41,7 +41,7 @@ namespace ATC2027
         TimeSpan previousLastAppendageToPreviousLocations = TimeSpan.Zero;
         
         MonogameTimeFilteredList<Vector2> previousLocations;
-        private static TimeSpan appendToPreviousLocationsFrequency = TimeSpan.FromMilliseconds(250); //the smaller this is the sooner the line drawing updates
+        private static TimeSpan appendToPreviousLocationsFrequency = TimeSpan.FromMilliseconds(100); //the smaller this is the sooner the line drawing updates
 
         #region textual components
         public string getTopLine() => this.altitude.GetAltitudeAsFlightLevel() + " " + VerticalMovement.ToString(this.verticalMovement) + " " + this.speed.ToKnots().ToString();
@@ -113,8 +113,7 @@ namespace ATC2027
 
         public float getTurningRadiusFromSpeed()
         {
-            return MathExtension.Map(this.speed.ToKnotsFloat()/500f,0.75,3);
-            throw new ApplicationException("");
+            return MathExtension.Map(this.speed.ToKnotsFloat()/500f,5,9);
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -327,8 +326,8 @@ namespace ATC2027
                 (float)Math.Cos(heading.GetHeadingInFloatRadians()),
                 (float)Math.Sin(heading.GetHeadingInFloatRadians())
             );
-            
-            head.SetCentre(head.GetCentre() + (directionOfMovement * magnitudeOfMovement));
+            location = head.GetCentre() + (directionOfMovement * magnitudeOfMovement);
+            head.SetCentre(location);
             
         }
 
@@ -448,6 +447,11 @@ namespace ATC2027
         {
             this.attributesHaveBeenUpdated = true;
             this.heading.Increment();
+        }
+
+        public Vector2 getLocation()
+        {
+            return location;
         }
     }
 }
