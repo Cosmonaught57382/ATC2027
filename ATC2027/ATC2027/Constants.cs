@@ -54,6 +54,14 @@ namespace ATC2027
         #endregion
         #region keyboard
         public static KeyboardState getKeyboardState() => Keyboard.GetState();
+
+        public static GraphicsDevice getGraphicsDevice()
+        {
+            return getSpriteBatch().GraphicsDevice;
+        }
         #endregion
+
+        public static int getHeightOfScreen => 720;
+        public static int getWidthOfScreen => 1080;
     }
 }
