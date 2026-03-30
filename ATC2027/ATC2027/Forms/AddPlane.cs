@@ -36,6 +36,11 @@ namespace ATC2027.Forms
             this.cr = cr;
 
             InitializeComponent();
+
+            this.lblErrorLabel.ForeColor = Color.Red;
+            this.lblErrorLabel.TextAlign = ContentAlignment.MiddleCenter;
+
+
             this.txtBoxFlightNumber.Text = getNextFlightNumber();
             this.cmbBoxSelectSide.Items.AddRange(["top","left","bottom","right"]);
 
@@ -48,7 +53,42 @@ namespace ATC2027.Forms
             this.btnAddPlane.TabIndex = 6;
         }
 
-        bool ValuesAreValid => true;
+        private bool ValuesAreValid(out string errorMessage)
+        {
+            errorMessage = "";
+            if (!FlightNumber.FlightNumberIsValid(ref errorMessage, txtBoxFlightNumber.Text))
+                return false;
+            if (!Altitude.AltitudeIsValid(ref errorMessage, txtBoxAltitude.Text, AltitudeTypeEnum.Feet))
+                return false;
+            if (!Speed.SpeedIsValid(ref errorMessage, txtBoxSpeed.Text))
+                return false;
+            if (!Heading.HeadingIsValid(ref errorMessage, txtBoxHeading.Text))
+                return false;
+            if (!cmbBoxSelectSide.Items.Contains(cmbBoxSelectSide.Text))
+            {
+                errorMessage = "Unable to find side that was selected";
+                return false;
+            }
+            if (!IsANumberWithInRange(txtBoxAcrossSide.Text, 0f, 100f))
+            {
+                errorMessage = "% across side was out of range";
+                return false;
+            }
+            
+            return true;
+
+        }
+        private bool IsANumberWithInRange(string text, float lowerLimitInclusive, float upperLimitInclusive)
+        {
+            float f;
+            try
+            {
+                f = float.Parse(text);
+
+                return lowerLimitInclusive <= f && f <= upperLimitInclusive;
+            }
+            catch { return false; }
+        }
 
         private float CalculateTimeObjectWillBeOnScreenFor(Vector2 x, IHeading heading, ISpeed speed, int buffer)
         {
@@ -108,16 +148,18 @@ namespace ATC2027.Forms
 
         private void btnAddPlane_Click(object sender, EventArgs e)
         {
-            var flNo = new FlightNumber(txtBoxFlightNumber.Text);
-            var heading = new Heading(txtBoxHeading.Text);
-            var altitude = new Altitude(int.Parse(txtBoxAltitude.Text));
-            var speed = new Speed(int.Parse(txtBoxSpeed.Text));
             
-            this.heading = heading;
-            var location = CalculateSpawnLocationOfPlane(cmbBoxSelectSide.Text, (float.Parse(txtBoxAcrossSide.Text)));
-
-            if (ValuesAreValid)
+            string errorMessage;
+            if (ValuesAreValid(out errorMessage))
             {
+                var flNo = new FlightNumber(txtBoxFlightNumber.Text);
+                var heading = new Heading(txtBoxHeading.Text);
+                var altitude = new Altitude(int.Parse(txtBoxAltitude.Text));
+                var speed = new Speed(int.Parse(txtBoxSpeed.Text));
+
+                this.heading = heading;
+                var location = CalculateSpawnLocationOfPlane(cmbBoxSelectSide.Text, (float.Parse(txtBoxAcrossSide.Text)));
+
                 cr.AddPlane(new Plane(
                     flNo,
                     heading,
@@ -132,6 +174,10 @@ namespace ATC2027.Forms
                 txtBoxSpeed.Text = "";
                 cmbBoxSelectSide.Text = "";
                 txtBoxAcrossSide.Text = "";
+            }
+            else
+            {
+                lblErrorLabel.Text = errorMessage;
             }
         }
     }

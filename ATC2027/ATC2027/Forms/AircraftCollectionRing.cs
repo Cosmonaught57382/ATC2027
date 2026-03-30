@@ -5,6 +5,7 @@ using ATC2027.ATC_Library.CollectionRing;
 using ATC2027.ATC_Library.Heading;
 using ATC2027.DataStructures;
 using ATC2027.Library.Altitude;
+using ATC2027.Library.FlightNumber;
 using ATC2027.Library.Speed;
 using SharpDX.DirectWrite;
 using System;
@@ -39,6 +40,8 @@ namespace ATC2027.Forms
             this.cr = cr;
 
             InitializeComponent();
+
+            
 
             statusBoardItemList ??= [];
 
@@ -223,10 +226,13 @@ namespace ATC2027.Forms
         {
             string errorMessage = "";
 
-            bool speedIsValid = SpeedIsValid(ref errorMessage);
-            bool altitudeIsValid = AltitudeIsValid(ref errorMessage);
-            bool headingIsValid = HeadingIsValid(ref errorMessage);
-            bool flightNumberIsValid = FlightNumberIsValid(ref errorMessage);
+            bool speedIsValid = Speed.SpeedIsValid(ref errorMessage, txtBoxSpeed.Text);
+            bool altitudeIsValid = Altitude.AltitudeIsValid(ref errorMessage, txtBoxAltitude.Text, Altitude.AltitudeTypeEnumFromString(cmbBoxAltitudeType.Text));
+            bool headingIsValid = Heading.HeadingIsValid(ref errorMessage, txtBoxHeading.Text);
+            bool flightNumberIsValid = FlightNumber.FlightNumberIsValid(ref errorMessage, cmbBoxSelectAircraft.Text);
+            
+            if (flightNumberIsValid)
+                flightNumberIsValid = cmbBoxSelectAircraft.Items.Contains(cmbBoxSelectAircraft.Text);
 
             if (!(speedIsValid && altitudeIsValid && headingIsValid && flightNumberIsValid))
             {
@@ -286,112 +292,7 @@ namespace ATC2027.Forms
                 cmbBoxAltitudeType.Text = "";
                 cmbBoxSelectAircraft.Text = "";
             } 
-        }
-        
-
-        private bool FlightNumberIsValid(ref string errorMessage)
-        {
-            bool result = cmbBoxSelectAircraft.Items.Contains(cmbBoxSelectAircraft.Text);
-            if (!result)
-                errorMessage = "flight number could not be found";
-
-            return result;
-
-        }
-
-        private bool SpeedIsValid(ref string errorMessage)
-        {
-            bool speedIsValid;
-            //speed is larger than 0 and less than 400
-            try
-            {
-                var val = Int128.Parse(txtBoxSpeed.Text);
-                
-                speedIsValid = val < 400 && val > 50;
-                if (!speedIsValid)
-                    errorMessage = "speed was out of the range";
-
-                return speedIsValid;
-            }
-            catch (Exception)
-            {
-                if (txtBoxSpeed.Text != "")
-                {
-                    errorMessage = "speed was not a number";
-                    return false;
-                }
-                return true;
-
-            }
-        }
-
-        private bool AltitudeIsValid(ref string errorMessage)
-        {
-            if (cmbBoxAltitudeType.SelectedItem == null)
-            {
-                errorMessage = "Altitude type was not selected";
-                return txtBoxAltitude.Text == "";
-            }
-                
-
-            bool altitudeIsInFeet = cmbBoxAltitudeType.Text.ToLower() == "feet";
-            
-            //altitude in feet is larger than 0 and less than 100000
-            if (altitudeIsInFeet)
-            {
-                try
-                {
-                    var val = Int128.Parse(txtBoxHeading.Text);
-                    return val < 100000 && val > -1;
-                }
-                catch (Exception)
-                {
-                    return txtBoxHeading.Text == "";
-                }
-            }
-            else
-            {
-               //altitude in flight level is larger than 0 and less than 100
-                try
-                {
-                   var val = Int128.Parse(txtBoxHeading.Text);
-                   return val < 100 && val > -1;
-                }
-                catch (Exception)
-                {
-                   return txtBoxHeading.Text == "";
-                }               
-            }
-        }
-
-        private bool HeadingIsValid(ref string errorMessage)
-        {
-            //heading is an integer larger than -1 and smaller than 361
-            bool headingIsOutsideTheRange;
-            bool isValid;
-            try
-            {
-                var val = Int128.Parse(txtBoxHeading.Text);
-                headingIsOutsideTheRange = !(val < 361 && val > -1);
-
-                if (headingIsOutsideTheRange)
-                {
-                    errorMessage = "heading was outside the range";
-                    return false;
-                }
-                return true;
-            }
-            catch (Exception)
-            {
-                
-                var result = (txtBoxHeading.Text == "");
-
-                if (!result)
-                    errorMessage = "heading was not a number";
-
-                return result;
-            }
-        }
+        }        
 
         private void UpdateCmbBoxSelectAircraft()
         {
