@@ -41,7 +41,7 @@ namespace ATC2027.Forms
 
             InitializeComponent();
 
-            
+
 
             statusBoardItemList ??= [];
 
@@ -60,30 +60,32 @@ namespace ATC2027.Forms
             statusBoardItemList.ItemHasBeenSetByIndexAccess += UpdateDataGridViewOfSelectedTabIndex;
             //statusBoardItemList.ItemHasBeenModified += UpdateForm;
         }
-        public void UpdateStatusBoardItemList() 
+        public void UpdateStatusBoardItemList()
         {
             this.statusBoardItemList = [.. cr.getAircraftCollectionRingListItemsAsList()];
         }
         public void UpdateForm(object sender = null, EventArgs? e = null)
         {
 
-            
+
         }
-        
-        public class FromUpdateFormFunctionCall : EventArgs {
+
+        public class FromUpdateFormFunctionCall : EventArgs
+        {
             EventArgs? previousEventArgs;
 
-            public FromUpdateFormFunctionCall(EventArgs e) {
+            public FromUpdateFormFunctionCall(EventArgs e)
+            {
                 previousEventArgs = e;
             }
         }
 
         private void UpdateDataGridViewOfSelectedTabIndex(object sender = null, EventArgs? e = null)
         {
-            
+
         }
 
-        
+
         private void btnApplyClearance_DragOver(object sender, DragEventArgs e)
         {
             //do nothing here, function is being kept so the form doesn't break
@@ -172,7 +174,7 @@ namespace ATC2027.Forms
             bool altitudeIsValid = Altitude.AltitudeIsValid(ref errorMessage, txtBoxAltitude.Text, Altitude.AltitudeTypeEnumFromString(cmbBoxAltitudeType.Text));
             bool headingIsValid = Heading.HeadingIsValid(ref errorMessage, txtBoxHeading.Text);
             bool flightNumberIsValid = FlightNumber.FlightNumberIsValid(ref errorMessage, cmbBoxSelectAircraft.Text);
-            
+
             if (flightNumberIsValid)
                 flightNumberIsValid = cmbBoxSelectAircraft.Items.Contains(cmbBoxSelectAircraft.Text);
 
@@ -180,7 +182,8 @@ namespace ATC2027.Forms
             {
                 lblResult.Text = errorMessage;
             }
-            else {
+            else
+            {
                 IClearance clearance = Clearance.getEmptyClearance();
 
                 if (txtBoxHeading.Text != "")
@@ -196,7 +199,7 @@ namespace ATC2027.Forms
                     catch (Exception)
                     {
                         //this should never happen, validation is done by the function SpeedIsValid
-                        MessageBox.Show(this,$"the given speed ({txtBoxSpeed.Text}) could not be converted to a float","Error",MessageBoxButtons.OK);
+                        MessageBox.Show(this, $"the given speed ({txtBoxSpeed.Text}) could not be converted to a float", "Error", MessageBoxButtons.OK);
                         txtBoxSpeed.Text = "";
                     }
                 }
@@ -233,17 +236,31 @@ namespace ATC2027.Forms
                 txtBoxSpeed.Text = "";
                 cmbBoxAltitudeType.Text = "";
                 cmbBoxSelectAircraft.Text = "";
-            } 
-        }        
+            }
+        }
 
         private void UpdateCmbBoxSelectAircraft()
         {
-            
+            cmbBoxSelectAircraft.Items.Clear();
+
+            IList<Plane> planes = cr.getAircraftCollection();
+            string[] flightNumbers = new string[planes.Count];
+
+            for (int i = 0; i < planes.Count; i++)
+            {
+                flightNumbers[i] = planes[i].flightNoAsStr();
+            }
+
+            cmbBoxSelectAircraft.Items.AddRange(flightNumbers);
         }
 
-        private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbBoxSelectAircraft_MouseEnter_1(object sender, EventArgs e)
         {
-            
+            UpdateCmbBoxSelectAircraft();
+        }
+
+        private void btnApplyClearance_Click_1(object sender, EventArgs e)
+        {
         }
     }
 }

@@ -90,6 +90,7 @@
             cmbBoxSelectAircraft.Name = "cmbBoxSelectAircraft";
             cmbBoxSelectAircraft.Size = new System.Drawing.Size(152, 33);
             cmbBoxSelectAircraft.TabIndex = 0;
+            cmbBoxSelectAircraft.MouseEnter += cmbBoxSelectAircraft_MouseEnter_1;
             // 
             // label1
             // 
@@ -168,6 +169,7 @@
             btnApplyClearance.TabIndex = 9;
             btnApplyClearance.Text = "Apply Clearance";
             btnApplyClearance.UseVisualStyleBackColor = true;
+            btnApplyClearance.Click += btnApplyClearance_Click;
             // 
             // cmbBoxAltitudeType
             // 
