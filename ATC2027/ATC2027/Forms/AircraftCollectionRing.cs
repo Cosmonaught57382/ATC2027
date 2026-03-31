@@ -47,16 +47,6 @@ namespace ATC2027.Forms
 
             UpdateStatusBoardItemList();
 
-            InitialiseDataGridView(ref dgvAllAircraft, this.statusBoardItemList);
-
-            tabIndexAndDataGridView = new Dictionary<int, DataGridView>
-            {
-                { 0, dgvAllAircraft },
-                { 1, dgvArrivals },
-                { 2, dgvDepartures },
-                { 3, dgvFlyBy }
-            };
-
             tabIndexAndFunctionThatGetsStatusBoardItems = new Dictionary<int, Func<IList<StatusBoardItem>>>
             {
                 {0, statusBoardItemList.ToList},
@@ -76,26 +66,8 @@ namespace ATC2027.Forms
         }
         public void UpdateForm(object sender = null, EventArgs? e = null)
         {
-            //set e to empty if e is null, good practice atm, e isn't accessed or used yet.
-            e ??= EventArgs.Empty;
-            
-            //get the current index
-            int index = tabControl.TabIndex;
-            
-            DataGridView dgv;
-            try
-            {
-                dgv = tabIndexAndDataGridView[index];
-            }
-            catch (IndexOutOfRangeException)
-            {
-                MessageBox.Show($"The {nameof(tabIndexAndDataGridView)} didn't have an item at index {tabControl.TabIndex}");
-                return;
-            }
 
-            UpdateStatusBoardItemList();
-            dgv.Invalidate();
-            UpdateDataGridViewOfSelectedTabIndex(sender, new FromUpdateFormFunctionCall(e));
+            
         }
         
         public class FromUpdateFormFunctionCall : EventArgs {
@@ -108,37 +80,7 @@ namespace ATC2027.Forms
 
         private void UpdateDataGridViewOfSelectedTabIndex(object sender = null, EventArgs? e = null)
         {
-            //set e to empty if e is null, good practice atm, e isn't accessed or used yet.
-            e ??= EventArgs.Empty;
-
-            //get the current index
-            int index = tabControl.TabIndex;
-
-            //get the dgv associated with the current index
-            DataGridView dgv;
-            try
-            {
-                dgv = tabIndexAndDataGridView[index];
-            }
-            catch (IndexOutOfRangeException)
-            {
-                MessageBox.Show($"The {nameof(tabIndexAndDataGridView)} didn't have an item at index {tabControl.TabIndex}");
-                return;
-            }
-
-            //get the function that gets the status board items associated with the current index
-            Func<IList<StatusBoardItem>> funcThatGetsStatusBoardItems;
-            try
-            {
-                funcThatGetsStatusBoardItems = tabIndexAndFunctionThatGetsStatusBoardItems[index];
-            }
-            catch (IndexOutOfRangeException)
-            {
-                DialogResult dialogResult = MessageBox.Show($"The {nameof(tabIndexAndFunctionThatGetsStatusBoardItems)} didn't have an item at index {tabControl.TabIndex}");
-                return;
-            }
-            dgv.Invalidate();
-            InitialiseDataGridView(ref dgv, funcThatGetsStatusBoardItems());
+            
         }
 
         
@@ -296,60 +238,11 @@ namespace ATC2027.Forms
 
         private void UpdateCmbBoxSelectAircraft()
         {
-            DataGridView dgv;
-            try
-            {
-                dgv = tabIndexAndDataGridView[tabControl.SelectedIndex];
-            }
-            catch (Exception)
-            {
-                //tabControl.SelectedIndex was not a valid value for the number of items in tabIndexAndDataGridView
-                return;
-            }
-            cmbBoxSelectAircraft.Items.Clear();
-
-            foreach (DataGridViewRow row in dgv.Rows)
-            {
-                cmbBoxSelectAircraft.Items.Add(row.Cells[0].Value);
-            }
-            cmbBoxSelectAircraft.Text = "";
+            
         }
 
         private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int selectedIndex = tabControl.SelectedIndex;
-            try
-            {
-                var dgv = tabIndexAndDataGridView[selectedIndex];
-                IList<StatusBoardItem> statusBoardItems;
-
-                switch (selectedIndex)
-                {
-                    case 0:
-                        statusBoardItems = flyByStatusBoardItems;
-                        break;
-                    case 1:
-                        statusBoardItems = arrivalStatusBoardItems;
-                        break;
-                    case 2:
-                        statusBoardItems = departureStatusBoardItems;
-                        break;
-                    case 3:
-                        statusBoardItems = flyByStatusBoardItems;
-                        break;
-                    default:
-                        throw new NotImplementedException("indexes beyond 3 not handled");
-                }
-                    
-
-                InitialiseDataGridView(ref dgv, statusBoardItems);
-                UpdateCmbBoxSelectAircraft();
-            }
-            catch (Exception)
-            {
-                lblResult.Text = $"ERROR - unable to set dgv with a selectedTabIndex of {selectedIndex}";
-                tabControl.SelectedIndex = 0;
-            }
             
         }
     }
