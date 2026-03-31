@@ -144,7 +144,7 @@ namespace ATC2027.Library.Altitude
             if (altitudeType == null)
             {
                 errorMessage = "Altitude type was not selected";
-                return false;
+                return text == "";
             }
 
 
