@@ -126,13 +126,13 @@ namespace ATC2027.Forms
             switch (sideName)
             {
                 case "top":
-                    spawnLocation = new Vector2(MathExtension.Map(proportionAcrossSide, 0, Constants.getHeightOfScreen), -20);
+                    spawnLocation = new Vector2(MathExtension.Map(proportionAcrossSide, 0, Constants.getWidthOfScreen), -20);
                     break;
                 case "bottom":
-                    spawnLocation = new Vector2(MathExtension.Map(proportionAcrossSide, 0, Constants.getHeightOfScreen), 20 + Constants.getHeightOfScreen);
+                    spawnLocation = new Vector2(MathExtension.Map(proportionAcrossSide, 0, Constants.getWidthOfScreen), 20 + Constants.getHeightOfScreen);
                     break;
                 case "left":
-                    spawnLocation = new Vector2(-20, MathExtension.Map(proportionAcrossSide, 0, Constants.getWidthOfScreen));
+                    spawnLocation = new Vector2(-20, MathExtension.Map(proportionAcrossSide, 0, Constants.getHeightOfScreen));
                     break;
                 case "right":
                     spawnLocation = new Vector2(20 + Constants.getWidthOfScreen, MathExtension.Map(proportionAcrossSide, 0, Constants.getHeightOfScreen));
@@ -174,6 +174,8 @@ namespace ATC2027.Forms
                 txtBoxSpeed.Text = "";
                 cmbBoxSelectSide.Text = "";
                 txtBoxAcrossSide.Text = "";
+
+                lblErrorLabel.Text = "";
             }
             else
             {
