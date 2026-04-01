@@ -69,39 +69,13 @@ namespace ATC2027.Forms
                 errorMessage = "Unable to find side that was selected";
                 return false;
             }
-            if (!IsANumberWithInRange(txtBoxAcrossSide.Text, 0f, 100f))
+            if (!MathExtension.IsANumberWithInRange(txtBoxAcrossSide.Text, 0f, 100f))
             {
                 errorMessage = "% across side was out of range";
                 return false;
             }
             
             return true;
-
-        }
-        private bool IsANumberWithInRange(string text, float lowerLimitInclusive, float upperLimitInclusive)
-        {
-            float f;
-            try
-            {
-                f = float.Parse(text);
-
-                return lowerLimitInclusive <= f && f <= upperLimitInclusive;
-            }
-            catch { return false; }
-        }
-
-        private float CalculateTimeObjectWillBeOnScreenFor(Vector2 x, IHeading heading, ISpeed speed, int buffer)
-        {
-            //S=D/T ::: T = D/S
-            var a = Constants.getHeightOfScreen + buffer - x.Y;
-            var b = Constants.getWidthOfScreen + buffer - x.X;
-            
-            float distance = (float)Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b,2));
-            return distance/speed.ToKnotsFloat();
-        }
-
-        private float CalculateScoreFromSpawnPoint(Vector2 x) {  
-            return CalculateTimeObjectWillBeOnScreenFor(x,this.heading, this.speedForCalculatingHowLongObjectWillBeOnScreenFor, this.bufferSize);
         }
 
         private IList<string> flightNumberPrefixes = ["BA", "AF", "EJ","LH"];
