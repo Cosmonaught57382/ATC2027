@@ -129,7 +129,7 @@ namespace ATC2027.Forms
                     spawnLocation = new Vector2(MathExtension.Map(proportionAcrossSide, 0, Constants.getHeightOfScreen), -20);
                     break;
                 case "bottom":
-                    spawnLocation = new Vector2(20 + Constants.getHeightOfScreen, MathExtension.Map(proportionAcrossSide, 0, Constants.getWidthOfScreen));
+                    spawnLocation = new Vector2(MathExtension.Map(proportionAcrossSide, 0, Constants.getHeightOfScreen), 20 + Constants.getHeightOfScreen);
                     break;
                 case "left":
                     spawnLocation = new Vector2(-20, MathExtension.Map(proportionAcrossSide, 0, Constants.getWidthOfScreen));

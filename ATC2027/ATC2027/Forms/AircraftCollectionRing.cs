@@ -262,5 +262,11 @@ namespace ATC2027.Forms
         private void btnApplyClearance_Click_1(object sender, EventArgs e)
         {
         }
+
+        private void cmbBoxSelectAircraft_SelectedValueChanged(object sender, EventArgs e)
+        {
+            cr.DeselectPlane();
+            cr.GetPlaneByFlightNumber(cmbBoxSelectAircraft.Text).SetIsSelected(true);
+        }
     }
 }

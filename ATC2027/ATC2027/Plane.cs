@@ -26,7 +26,7 @@ namespace ATC2027
         
         TimeSpan? timeOfLastUpdate = null;
 
-        bool isSelected = true;
+        bool isSelected = false;
 
         Color selectedTextDrawColor;
         Color normalTextDrawColor;
@@ -452,6 +452,11 @@ namespace ATC2027
         public Vector2 getLocation()
         {
             return location;
+        }
+
+        internal void SetIsSelected(bool value)
+        {
+            this.isSelected = value;
         }
     }
 }

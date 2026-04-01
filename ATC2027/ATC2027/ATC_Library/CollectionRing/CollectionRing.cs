@@ -111,6 +111,12 @@ namespace ATC2027.ATC_Library.CollectionRing
             }
         }
 
+        internal void DeselectPlane()
+        {
+            foreach (var kvp in planeCollection)
+                kvp.Value.SetIsSelected(false);
+        }
+
         internal TimeSpan getLastUpdate()
         {
             return lastUpdate;
