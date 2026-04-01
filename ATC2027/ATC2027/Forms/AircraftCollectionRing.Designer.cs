@@ -90,6 +90,7 @@
             cmbBoxSelectAircraft.Name = "cmbBoxSelectAircraft";
             cmbBoxSelectAircraft.Size = new System.Drawing.Size(152, 33);
             cmbBoxSelectAircraft.TabIndex = 0;
+            cmbBoxSelectAircraft.TextUpdate += cmbBoxSelectAircraft_TextUpdate;
             cmbBoxSelectAircraft.SelectedValueChanged += cmbBoxSelectAircraft_SelectedValueChanged;
             cmbBoxSelectAircraft.MouseEnter += cmbBoxSelectAircraft_MouseEnter_1;
             // 

@@ -266,7 +266,14 @@ namespace ATC2027.Forms
         private void cmbBoxSelectAircraft_SelectedValueChanged(object sender, EventArgs e)
         {
             cr.DeselectPlane();
-            cr.GetPlaneByFlightNumber(cmbBoxSelectAircraft.Text).SetIsSelected(true);
+            Plane selectedPlane = cr.GetPlaneByFlightNumber(cmbBoxSelectAircraft.Text);
+            if (selectedPlane is not null)
+                selectedPlane.SetIsSelected(true);
+        }
+
+        private void cmbBoxSelectAircraft_TextUpdate(object sender, EventArgs e)
+        {
+            cmbBoxSelectAircraft_SelectedValueChanged(sender, e);
         }
     }
 }
