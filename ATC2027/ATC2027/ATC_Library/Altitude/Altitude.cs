@@ -62,7 +62,7 @@ namespace ATC2027.Library.Altitude
                     noOfShifts--;
                 }
                 altitudeAsFlightLevelAsString = altitudeAsFlightLevel.ToString();
-                altitudeAsFlightLevelAsString = stringExtension.GetFirstXCharactersFromString(ref altitudeAsFlightLevelAsString, numberOfDigitsAfterTheDecimalPoint == 0 ? 1 : 2 + numberOfDigitsAfterTheDecimalPoint);
+                altitudeAsFlightLevelAsString = StringExtension.GetFirstXCharactersFromString(ref altitudeAsFlightLevelAsString, numberOfDigitsAfterTheDecimalPoint == 0 ? 1 : 2 + numberOfDigitsAfterTheDecimalPoint);
 
             }
             else

@@ -150,7 +150,7 @@ namespace ATC2027
             var location = planeHead.GetCentre();
             var topLine = getTopLine();
 
-            var str = stringExtension.characterReplacer(topLine + topLine, ' ');
+            var str = StringExtension.characterReplacer(topLine + topLine, ' ');
 
 
             location.X -= font.MeasureString(str).X / 2;
