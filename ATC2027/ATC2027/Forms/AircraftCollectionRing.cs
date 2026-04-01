@@ -27,57 +27,17 @@ namespace ATC2027.Forms
         public bool formShouldBeUpdated = false;
 
         private readonly CollectionRing cr;
-        private EventBasedList<StatusBoardItem> statusBoardItemList;
-        private IList<StatusBoardItem> arrivalStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "arr")];
-        private IList<StatusBoardItem> departureStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "dep")];
-        private IList<StatusBoardItem> flyByStatusBoardItems => [.. statusBoardItemList.Where(x => x.getRelationToThisAirfield() == "FlyOver")];
-
-        private readonly Dictionary<int, DataGridView> tabIndexAndDataGridView;
-        private readonly Dictionary<int, Func<IList<StatusBoardItem>>> tabIndexAndFunctionThatGetsStatusBoardItems;
-
+        
+        
         public AircraftCollectionRing(ref CollectionRing cr)
         {
             this.cr = cr;
 
             InitializeComponent();
 
-
-
-            statusBoardItemList ??= [];
-
-            UpdateStatusBoardItemList();
-
-            tabIndexAndFunctionThatGetsStatusBoardItems = new Dictionary<int, Func<IList<StatusBoardItem>>>
-            {
-                {0, statusBoardItemList.ToList},
-                {1, arrivalStatusBoardItems.ToList},
-                {2, departureStatusBoardItems.ToList},
-                {3, flyByStatusBoardItems.ToList}
-            };
-
-            statusBoardItemList.ItemAdded += UpdateDataGridViewOfSelectedTabIndex;
-            statusBoardItemList.ItemRemoved += UpdateDataGridViewOfSelectedTabIndex;
-            statusBoardItemList.ItemHasBeenSetByIndexAccess += UpdateDataGridViewOfSelectedTabIndex;
-            //statusBoardItemList.ItemHasBeenModified += UpdateForm;
-        }
-        public void UpdateStatusBoardItemList()
-        {
-            this.statusBoardItemList = [.. cr.getAircraftCollectionRingListItemsAsList()];
         }
         public void UpdateForm(object sender = null, EventArgs? e = null)
         {
-
-
-        }
-
-        public class FromUpdateFormFunctionCall : EventArgs
-        {
-            EventArgs? previousEventArgs;
-
-            public FromUpdateFormFunctionCall(EventArgs e)
-            {
-                previousEventArgs = e;
-            }
         }
 
         private void UpdateDataGridViewOfSelectedTabIndex(object sender = null, EventArgs? e = null)
@@ -127,43 +87,16 @@ namespace ATC2027.Forms
             //do nothing here, function is being kept so the form doesn't break
         }
 
-        public void SetDataGrid(IList<StatusBoardItem> statusBoardItemList)
-        {
-
-        }
-
-        private void InitialiseDataGridView(ref DataGridView dgv, IList<StatusBoardItem> statusBoardItems)
-        {
-            dgv.Rows.Clear();
-            dgv.Columns.Clear();
-
-            dgv.Columns.Add("Flight Number", "FlightNumber");
-            dgv.Columns.Add("Heading", "Heading (deg)");
-            dgv.Columns.Add("Altitude", "Altitude");
-            dgv.Columns.Add("Speed", "Speed");
-            dgv.Columns.Add("Relation to airfield", "RelationToAirfield");
-
-            foreach (StatusBoardItem sbi in statusBoardItems)
-            {
-                dgv.Rows.Add(sbi.getFlightNo(), sbi.getHeadingAsStr(), sbi.getAltitudeAsStr(), sbi.getSpeed(), sbi.getRelationToThisAirfield());
-            }
-
-
-        }
-
         private void btnApplyClearance_MouseHover(object sender, EventArgs e)
         {
-            cmbBoxAltitudeType.Cursor = Cursors.Hand;
         }
 
         private void cmbBoxSelectAircraft_MouseHover(object sender, EventArgs e)
         {
-            cmbBoxAltitudeType.Cursor = Cursors.Hand;
         }
 
         private void cmbBoxAltitudeType_MouseHover(object sender, EventArgs e)
         {
-            cmbBoxAltitudeType.Cursor = Cursors.Hand;
         }
 
         private void btnApplyClearance_Click(object sender, EventArgs e)
