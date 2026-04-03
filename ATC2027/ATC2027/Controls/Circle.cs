@@ -17,11 +17,12 @@ namespace ATC2027.Controls
 
         Texture2D texture;
 
-        public Circle(Vector2 location, int radius, GraphicsDevice graphicsDevice) {
+        public Circle(Vector2 location, int radius, Color color, GraphicsDevice graphicsDevice) {
             this.location = location;
             this.radius = radius;
             this.graphicsDevice = graphicsDevice;
-            
+            this.color = color;
+
             UpdateTexture();
         }
 
