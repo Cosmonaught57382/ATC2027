@@ -22,7 +22,6 @@ namespace ATC2027.Controls
             this.radius = radius;
             this.graphicsDevice = graphicsDevice;
             this.color = color;
-
             UpdateTexture();
         }
 

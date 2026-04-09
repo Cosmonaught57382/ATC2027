@@ -53,8 +53,15 @@ namespace ATC2027.Controls
 
             if (color == null)
                 color = Color.Black;
-
-            spriteBatch.DrawString(spriteFont, text, (Vector2)location, (Color)color);
+            try
+            {
+                spriteBatch.DrawString(spriteFont, text, (Vector2)location, (Color)color);
+            }
+            catch (Exception)
+            {
+                spriteBatch.DrawString(spriteFont, "?", (Vector2)location, (Color)color);
+            }
+            
         }
     }
 }

@@ -16,7 +16,7 @@ namespace ATC2027.ATC_Library
                 case VerticalMovementEnum.up:
                     return "^";
                 case VerticalMovementEnum.down:
-                    return "⌄";
+                    return "\\/";
                 case VerticalMovementEnum.constant:
                     return "->";
                 case VerticalMovementEnum.unknown:

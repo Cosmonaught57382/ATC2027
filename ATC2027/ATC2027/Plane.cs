@@ -44,16 +44,17 @@ namespace ATC2027
         private static TimeSpan appendToPreviousLocationsFrequency = TimeSpan.FromMilliseconds(100); //the smaller this is the sooner the line drawing updates
 
         #region textual components
-        public string getTopLine() => this.altitude.GetAltitudeAsFlightLevel() + " " + VerticalMovement.ToString(this.verticalMovement) + " " + this.speed.ToKnots().ToString();
+        public string getTopLine() => "fl " + this.altitude.GetAltitudeAsFlightLevel(1) + " " + VerticalMovement.ToString(this.verticalMovement) + " " + this.speed.ToKnots().ToString();
         public string getBottomLine() => flightNumber.ToString();
         #endregion
 
         //Altitude
         IAltitude altitude;
+        IAltitude previousAltitude;
         VerticalMovement.VerticalMovementEnum verticalMovement;
         bool updateAltitudeNow;
         TimeSpan altitudeUpdateFrequency = TimeSpan.FromMilliseconds(100);
-        float rateOfDescentPerPeriod = 1f;
+        float rateOfDescentPerPeriod = 15f;
         TimeSpan lastAltitudeUpdate;
         //Speed
         ISpeed speed;
@@ -82,6 +83,7 @@ namespace ATC2027
             if (this.clearance == null)
             {
                 this.clearance = Clearance.getEmptyClearance();
+                this.verticalMovement = VerticalMovement.VerticalMovementEnum.unknown;
             }
 
 
@@ -129,17 +131,17 @@ namespace ATC2027
         {
             var font = Constants.getArial_7();
             var location = planeHead.GetCentre();
-            var str = getTopLine();
+            var str = getBottomLine();
             location.X -= font.MeasureString(str).X / 2;
             location.Y += font.MeasureString(str).Y / 2;
 
             if (isSelected)
             {
-                Text.StaticDraw(spriteBatch, this.getBottomLine(), font, location, selectedTextDrawColor);
+                Text.StaticDraw(spriteBatch, str, font, location, selectedTextDrawColor);
             }
             else
             {
-                Text.StaticDraw(spriteBatch, this.getBottomLine(), font, location, normalTextDrawColor);
+                Text.StaticDraw(spriteBatch, str, font, location, normalTextDrawColor);
             }
             
         }
@@ -179,7 +181,7 @@ namespace ATC2027
 
             UpdateTailInformation(gameTime);
             UpdateHeadInformation(gameTime);
-            
+
             tail.Update(gameTime);
             head.Update(gameTime);
 
@@ -212,6 +214,9 @@ namespace ATC2027
             }
             #endregion
 
+            UpdateVerticalMovementSymbol();
+            previousAltitude = altitude;
+
             if (isSelected)
             {
                 bool leftArrowDown = false;
@@ -228,6 +233,25 @@ namespace ATC2027
                     attributesHaveBeenUpdated = true;
                 }
             }
+        }
+
+        private void UpdateVerticalMovementSymbol()
+        {
+            if (previousAltitude == null || altitude == null)
+            {
+                verticalMovement = VerticalMovement.VerticalMovementEnum.unknown;
+                return;
+            }
+            var previousAltitudeInFeet = previousAltitude.GetAltitudeInFeet();
+            var currentAltitudeInFeet = altitude.GetAltitudeInFeet();
+            if (previousAltitudeInFeet == currentAltitudeInFeet)
+                verticalMovement = VerticalMovement.VerticalMovementEnum.constant;
+            else if (previousAltitudeInFeet < currentAltitudeInFeet)
+                verticalMovement = VerticalMovement.VerticalMovementEnum.up;
+            else if (previousAltitudeInFeet > currentAltitudeInFeet)
+                verticalMovement = VerticalMovement.VerticalMovementEnum.down;
+            else
+                verticalMovement = VerticalMovement.VerticalMovementEnum.unknown;
         }
 
         private void UpdateSpeed()
@@ -428,9 +452,18 @@ namespace ATC2027
                 ATC_Library.FlightRelationToAirfield.FlightRelationToAirfieldEnum.FlyOver);
         }
 
+
         internal void setClearance(ref IClearance clearance)
         {
+            if (this.clearance.GetAltitude() == null)
+                this.verticalMovement = VerticalMovement.VerticalMovementEnum.unknown;
+            else if (this.clearance.GetAltitude().GetAltitudeInFeet() == this.altitude.GetAltitudeInFeet())
+                this.verticalMovement = VerticalMovement.VerticalMovementEnum.constant;
+
             this.clearance = clearance;
+            
+
+            
         }
 
         internal IAircraftCollectionRingItem ToAirCraftCollectionRingItem()

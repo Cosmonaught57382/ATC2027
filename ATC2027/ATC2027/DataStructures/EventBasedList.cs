@@ -30,6 +30,7 @@ namespace ATC2027.DataStructures
             set
             {
                 value = _list[index];
+                ItemHasBeenSetByIndexAccess.Invoke(this, EventArgs.Empty);
             }
         }
 

@@ -68,6 +68,7 @@ namespace ATC2027.Forms
             cmbBoxAltitudeType.Items.Add("Flight Level");
 
             txtBoxSpeed.TabIndex = 4;
+            btnApplyClearance.TabIndex = 5;
 
             UpdateCmbBoxSelectAircraft();
         }
@@ -169,6 +170,8 @@ namespace ATC2027.Forms
                 txtBoxSpeed.Text = "";
                 cmbBoxAltitudeType.Text = "";
                 cmbBoxSelectAircraft.Text = "";
+
+                cmbBoxSelectAircraft_SelectedValueChanged(sender, e);
             }
         }
 
@@ -200,8 +203,7 @@ namespace ATC2027.Forms
         {
             cr.DeselectPlane();
             Plane selectedPlane = cr.GetPlaneByFlightNumber(cmbBoxSelectAircraft.Text);
-            if (selectedPlane is not null)
-                selectedPlane.SetIsSelected(true);
+            cr.SelectPlane(ref selectedPlane);
         }
 
         private void cmbBoxSelectAircraft_TextUpdate(object sender, EventArgs e)

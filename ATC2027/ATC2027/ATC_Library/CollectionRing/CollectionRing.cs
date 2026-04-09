@@ -18,6 +18,7 @@ namespace ATC2027.ATC_Library.CollectionRing
         
         public Dictionary<string, Plane> planeCollection;
         private TimeSpan lastUpdate;
+        private Plane? selectedPlane;
 
         public CollectionRing()
         {
@@ -72,12 +73,15 @@ namespace ATC2027.ATC_Library.CollectionRing
 
         public string getDevModeDrawableString()
         {
-            return $"CollectionSize: {this.planeCollection.Count}";
+            return $"{selectedPlane?.getDevModeDrawableString()}\nCollectionSize: {this.planeCollection.Count}";
         }
 
         public void RemovePlane(Plane plane)
         {
             planeCollection.Remove(plane.flightNoAsStr(), out _);
+            
+            if (selectedPlane != null || plane.flightNoAsStr() == selectedPlane.flightNoAsStr())
+                selectedPlane = null;
         }
 
         public void Update(GameTime gameTime)
@@ -111,10 +115,21 @@ namespace ATC2027.ATC_Library.CollectionRing
             }
         }
 
-        internal void DeselectPlane()
+        public void DeselectPlane()
         {
-            foreach (var kvp in planeCollection)
-                kvp.Value.SetIsSelected(false);
+            if (selectedPlane is not null)
+            {
+                planeCollection[selectedPlane.flightNoAsStr()].SetIsSelected(false);
+                selectedPlane = null;
+            }
+                
+        }
+
+        public void SelectPlane(ref Plane plane)
+        {
+            this.selectedPlane = plane;
+            plane?.SetIsSelected(true);
+            selectedPlane = plane;
         }
 
         internal TimeSpan getLastUpdate()

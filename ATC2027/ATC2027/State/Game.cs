@@ -10,6 +10,7 @@ using ATC2027.ATC_Library.Heading;
 using ATC2027.ATC_Library.CollectionRing;
 using System;
 using Microsoft.Xna.Framework.Input;
+using ATC2027.Controls;
 
 namespace ATC2027.State
 {
@@ -29,18 +30,16 @@ namespace ATC2027.State
         private TimeSpan collectionRingUpdateFrequency = TimeSpan.FromSeconds(1);
         #endregion
 
-
         public override string getName => this.GetType().Name;
 
         public Game(ICollection<Plane>? planeList = null)
         {
-            if (planeList == null) planeList = new List<Plane>(); 
+            
+            planeList ??= new List<Plane>(); 
 
             this.cr = new CollectionRing();
 
             foreach (Plane plane in planeList) { cr.AddPlane(plane); }
-
-            indexOfSelectedPlane = cr.planeCollection.Count-1;
 
             //set up the aircraft collection ring form
             IList<StatusBoardItem> statusBoardItemList = [];
@@ -70,6 +69,7 @@ namespace ATC2027.State
         
         public override void Update(GameTime gameTime)
         {
+
             if (!(cr is null) && gameTime.TotalGameTime - cr.getLastUpdate() > collectionRingUpdateFrequency)
                 cr.Update(gameTime);
 
@@ -135,15 +135,7 @@ namespace ATC2027.State
 
         public override string getDevModeDrawableString()
         {
-            string toReturn = "";
-            if (indexOfSelectedPlane < 0)
-                toReturn = "selected plane is null";
-            else if (indexOfSelectedPlane > cr.planeCollection.Count - 1)
-                toReturn = "indexOfSelectedPlane is too large";
-            else
-                toReturn = cr.planeCollection.Values.ToList()[indexOfSelectedPlane].getDevModeDrawableString();
-
-            return $"{toReturn}\n{cr.getDevModeDrawableString()}";
+            return $"{cr.getDevModeDrawableString()}";
         }
     }
 }
